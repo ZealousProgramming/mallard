@@ -51,6 +51,7 @@ Mallard_Element :: struct {
 	// Weak
 	container:    ^Mallard_Element,
 	children:     [dynamic]^Mallard_Element,
+	rect:         mc.Rect,
 	variant:      union {
 		^Mallard_Window,
 		^Mallard_ScrollBox,
@@ -71,15 +72,10 @@ Mallard_Button :: struct {
 	using uie:      Mallard_Element,
 	label:          ^Mallard_Label,
 	state:          Mallard_Button_State,
-	hover_color:    mc.Color,
-	normal_color:   mc.Color,
+	style:          Mallard_Button_Style,
 	selected_color: mc.Color,
 	draggable:      bool,
 	dragging:       bool,
-	is_rounded:     bool,
-	segments:       int,
-	roundness:      f32,
-	line_thickness: f32,
 	on_click:       #type proc(),
 }
 
