@@ -3,7 +3,7 @@ package mallard
 import rl "vendor:raylib"
 
 panel_init :: proc(
-	container: ^Mallard_Transform,
+	container: ^Mallard_Element,
 	transform: Mallard_Transform,
 	background_color: rl.Color,
 	allocator := context.allocator,
@@ -14,21 +14,15 @@ panel_init :: proc(
 	p.variant = p
 	p.transform = transform
 	p.transform.global = transform.local
+	p.background_color = background_color
 
 	// VTable
 	p.vtable = new(Mallard_Element_VTable, allocator)
-	p.vtable.deinit = panel_free
+	p.vtable.deinit = element_basic_deinit
 	p.vtable.update = nil
 	p.vtable.draw = panel_draw
 
 	return p
-}
-
-
-panel_free :: proc(self: ^Mallard_Element, allocator := context.allocator) {
-	// el, _ := element_variant(self, Mallard_Panel)
-
-	free(self, allocator)
 }
 
 panel_draw :: proc(self: ^Mallard_Element) {

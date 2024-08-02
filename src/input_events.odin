@@ -178,7 +178,8 @@ editor_mouse_motion_check :: proc() {
 	mme.input_kind = .MOUSE_MOTION
 	mme.mouse_position = get_mouse_position()
 
-	for el in root_elements {
+
+	for el in ROOT_CONTAINER.children {
 		if editor_handle_input(el, mme) {break}
 	}
 }
@@ -213,7 +214,7 @@ editor_mouse_button_check :: proc() {
 
 	if mbe.mb_kind == .NIL {return}
 
-	for el in root_elements {
+	for el in ROOT_CONTAINER.children {
 		if editor_handle_input(el, mbe) {break}
 	}
 }
@@ -235,7 +236,7 @@ editor_mouse_wheel_check :: proc() {
 
 	if mwe.input_kind == .NIL {return}
 
-	for el in root_elements {
+	for el in ROOT_CONTAINER.children {
 		if editor_handle_input(el, mwe) {break}
 	}
 }
@@ -252,7 +253,7 @@ editor_keyboard_check :: proc() {
 
 		if evt.kb_kind == .NIL {continue}
 
-		for el in root_elements {
+		for el in ROOT_CONTAINER.children {
 			if editor_handle_input(el, evt) {break}
 		}
 	}

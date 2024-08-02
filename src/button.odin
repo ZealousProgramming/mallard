@@ -5,7 +5,7 @@ import "core:strings"
 import rl "vendor:raylib"
 
 button_init :: proc(
-	container: ^Mallard_Transform,
+	container: ^Mallard_Element,
 	label: string,
 	transform: Mallard_Transform,
 	background_color: rl.Color,
@@ -39,7 +39,7 @@ button_init :: proc(
 }
 
 rounded_button_init :: proc(
-	container: ^Mallard_Transform,
+	container: ^Mallard_Element,
 	label: string,
 	transform: Mallard_Transform,
 	background_color: rl.Color,

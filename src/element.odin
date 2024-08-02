@@ -18,15 +18,18 @@ element_update :: proc(el: ^Mallard_Element, allocator := context.allocator) {
 
 element_draw :: proc(el: ^Mallard_Element, allocator := context.allocator) {
 	if el == nil {return}
+
+	if el.draw != nil {
+		el->draw()
+	}
+
 	if el.children != nil && len(el.children) > 0 {
 		for c in el.children {
 			element_draw(c, allocator)
 		}
 	}
 
-	if el.draw != nil {
-		el->draw()
-	}
+
 }
 
 element_deinit :: proc(el: ^Mallard_Element, allocator := context.allocator) {
@@ -59,6 +62,11 @@ element_variant :: proc(el: ^Mallard_Element, $T: typeid) -> (^T, Mallard_Ui_Err
 	return nil, .TYPE_NOT_FOUND
 }
 
+element_basic_deinit :: proc(self: ^Mallard_Element, allocator := context.allocator) {
+	free(self, allocator)
+}
+
+
 element_rect :: proc(el: ^Mallard_Element) -> mc.Rect {
 	if el == nil {return mc.Rect{}}
 	gp := el.transform.global
@@ -76,6 +84,16 @@ element_position :: proc(el: ^Mallard_Element) {
 
 		element_position(c)
 	}
+}
+
+element_recalculate_global_position :: proc(self: ^Mallard_Element) -> mc.Vec2 {
+	if self.container == nil {
+		return self.transform.local
+	}
+
+	container_p := element_recalculate_global_position(self.container)
+
+	return self.transform.local + container_p
 }
 
 is_element_under_mouse :: proc(r: mc.Rect) -> bool {

@@ -49,7 +49,7 @@ Mallard_Element :: struct {
 	using vtable: ^Mallard_Element_VTable,
 	transform:    Mallard_Transform,
 	// Weak
-	container:    ^Mallard_Transform,
+	container:    ^Mallard_Element,
 	children:     [dynamic]^Mallard_Element,
 	variant:      union {
 		^Mallard_Window,
@@ -62,6 +62,8 @@ Mallard_Element :: struct {
 		^Mallard_TextField,
 		^Mallard_Viewport,
 		^Mallard_Panel,
+		^Mallard_Container,
+		^Mallard_Vertical_Container,
 	},
 }
 
@@ -135,4 +137,14 @@ Mallard_Viewport :: struct {
 Mallard_Panel :: struct {
 	using uie:        Mallard_Element,
 	background_color: mc.Color,
+}
+
+Mallard_Container :: struct {
+	using uie: Mallard_Element,
+}
+
+Mallard_Vertical_Container :: struct {
+	using uie: Mallard_Element,
+	alignment: Mallard_Vertical_Alignment,
+	fill:      bool,
 }

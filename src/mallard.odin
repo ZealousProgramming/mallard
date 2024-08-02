@@ -14,11 +14,9 @@ DEFAULT_WINDOW_WIDTH: i32 = 1280
 DEFAULT_WINDOW_HEIGHT: i32 = 720
 DEFAULT_VIEWPORT_WIDTH: i32 = 960
 DEFAULT_VIEWPORT_HEIGHT: i32 = 540
-ROOT_CONTAINER := Mallard_Transform {
-	global = mc.Vec2{0.0, 0.0},
-	local = mc.Vec2{0.0, 0.0},
-	size = mc.Vec2{1.0, 1.0},
-}
+ROOT_CONTAINER: ^Mallard_Container
+nav_panel: ^Mallard_Panel
+
 
 Mallard_State :: struct {
 	viewport_bg_color, component_bg_color:                   mc.Color,
@@ -38,7 +36,6 @@ state := Mallard_State {
 	viewport_bg_color = {24, 24, 24, 255},
 }
 
-root_elements: [dynamic]^Mallard_Element
 viewport_texture: mc.RenderTexture
 
 circle_transform := mc.Xform {
@@ -81,6 +78,8 @@ main :: proc() {
 
 		circle_transform.translation.x = circle_transform.translation.x + delta * movement_speed
 		circle_transform.scale.x = circle_transform.scale.x + delta * growth_speed
+
+		nav_panel.transform.local.x += delta * movement_speed
 
 		update(delta)
 
@@ -125,9 +124,7 @@ render :: proc() {
 			mc.WHITE,
 		)
 
-		for el in root_elements {
-			element_draw(el)
-		}
+		element_draw(ROOT_CONTAINER)
 	}
 	mc._endDrawing()
 }
@@ -142,16 +139,24 @@ init :: proc() {
 	mc._initWindow(state.screen_width, state.screen_height, "Mallard")
 	mc._setTargetFPS(60)
 
-	root_elements = make([dynamic]^Mallard_Element)
 	// editor_font = mc._loadFontEx("./assets/roboto/Roboto.ttf", i32(EDITOR_FONT_SIZE), nil, 250)
 	editor_font = mc._loadFontEx("./assets/zed-mono/zed-mono-semibold.ttf", i32(32), nil, 0)
 	mc._setTextureFilter(editor_font.texture, mc.TextureFilter.BILINEAR)
 
+	// Setup root container
+	ROOT_CONTAINER = container_init(
+		nil,
+		Mallard_Transform {
+			global = mc.Vec2{0.0, 0.0},
+			local = mc.Vec2{0.0, 0.0},
+			size = mc.Vec2{1.0, 1.0},
+		},
+	)
 	viewport_texture = mc._loadRenderTexture(state.viewport_width, state.viewport_height)
 	// mc._setTextureFilter(viewport_texture.texture, mc.TextureFilter.BILINEAR)
 
 	button := rounded_button_init(
-		&ROOT_CONTAINER,
+		ROOT_CONTAINER,
 		"Some text",
 		Mallard_Transform{local = mc.Vec2{50, 50}, size = mc.Vec2{96, 24}},
 		mc.Color{96, 96, 96, 255},
@@ -161,23 +166,27 @@ init :: proc() {
 		4.0,
 	)
 
-	nav_panel := panel_init(
-		&ROOT_CONTAINER,
-		Mallard_Transform{local = mc.Vec2{0, 0}, size = mc.Vec2{24, f32(mc._getScreenHeight())}},
-		mc.Color{24, 24, 24, 255},
+	nav_panel = panel_init(
+		ROOT_CONTAINER,
+		Mallard_Transform{local = mc.Vec2{10, 0}, size = mc.Vec2{48, f32(mc._getScreenHeight())}},
+		mc.BLUE,
+		// mc.Color{24, 24, 24, 255},
 	)
 
-	append(&root_elements, button)
-	append(&root_elements, nav_panel)
+	nav_vert_container := vertical_container_init(
+		nav_panel,
+		Mallard_Transform{local = mc.Vec2{0.0, 0.0}},
+	)
+	append(&nav_panel.children, nav_vert_container)
+
+	append(&ROOT_CONTAINER.children, button)
+	append(&ROOT_CONTAINER.children, nav_panel)
 }
 
 deinit :: proc(allocator := context.allocator) {
 	log.info("[deinit]")
 
-	for e in root_elements {
-		element_deinit(e, allocator)
-	}
-	delete(root_elements)
+	element_deinit(ROOT_CONTAINER, allocator)
 
 	mc._unloadRenderTexture(viewport_texture)
 	mc._unloadFont(editor_font)
@@ -194,11 +203,6 @@ deinit :: proc(allocator := context.allocator) {
 }
 
 update :: proc(delta_time: f32) {
-	for e in root_elements {
-		element_update(e)
-	}
-
-	for e in root_elements {
-		element_position(e)
-	}
+	element_update(ROOT_CONTAINER)
+	element_position(ROOT_CONTAINER)
 }
