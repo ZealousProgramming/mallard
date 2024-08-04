@@ -7,7 +7,7 @@ parent: ^Mallard_Element
 mal_push_container(parent)
 
 if mal_button("Some Button", DEFAULT_BUTTON_STYLE) {
-	log.info("Some button pressed"")
+	log.info("Some button pressed")
 }
 
 mal_pop_container()

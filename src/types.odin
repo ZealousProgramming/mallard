@@ -1,10 +1,32 @@
 package mallard
 import mc "./common"
+import c "core:c"
 import "core:mem"
+
+Mallard_State :: struct {
+	viewport_bg_color, component_bg_color:                   mc.Color,
+	screen_width, screen_height:                             c.int,
+	viewport_x, viewport_y, viewport_width, viewport_height: c.int,
+	mouse_position:                                          mc.Vec2,
+	stack_position:                                          mc.Vec2,
+}
+
+Mallard_Render_Command :: struct {
+	draw:     #type proc(el: ^Mallard_Element),
+	deinit:   #type proc(el: ^Mallard_Element, allocator: mem.Allocator),
+	instance: ^Mallard_Element,
+}
 
 Mallard_Ui_Error :: enum {
 	NIL,
 	TYPE_NOT_FOUND,
+}
+
+Mallard_Sizing_Behavior :: enum {
+	FILL, // Fills the available space without affecting other elements
+	BEGIN, // Align with container start, and only fill the minimum size of the element
+	CENTER, // Align with container center, and only fill the minimum size of the element
+	END, // Align with container end, and only fill the minimum size of the element
 }
 
 Mallard_Button_State :: enum {
@@ -31,28 +53,15 @@ Mallard_Vertical_Alignment :: enum {
 	BOTTOM,
 }
 
-Mallard_Transform :: struct {
-	global: mc.Vec2,
-	local:  mc.Vec2,
-	size:   mc.Vec2,
-}
-
-Mallard_Element_VTable :: struct {
-	handle_input: #type proc(el: ^Mallard_Element, evt: Input_Event) -> bool,
-	draw:         #type proc(el: ^Mallard_Element),
-	update:       #type proc(el: ^Mallard_Element),
-	init:         #type proc(el: ^Mallard_Element, allocator: mem.Allocator),
-	deinit:       #type proc(el: ^Mallard_Element, allocator: mem.Allocator),
-}
-
 Mallard_Element :: struct {
-	using vtable: ^Mallard_Element_VTable,
-	transform:    Mallard_Transform,
+	rect:      mc.Rect,
+	min_size:  mc.Vec2,
+	vertical_sizing: Mallard_Sizing_Behavior,
+	horizontal_sizing: Mallard_Sizing_Behavior,
 	// Weak
-	container:    ^Mallard_Element,
-	children:     [dynamic]^Mallard_Element,
-	rect:         mc.Rect,
-	variant:      union {
+	container: ^Mallard_Element,
+	children:  [dynamic]^Mallard_Element,
+	variant:   union {
 		^Mallard_Window,
 		^Mallard_ScrollBox,
 		^Mallard_Scrollbar,
@@ -69,14 +78,14 @@ Mallard_Element :: struct {
 }
 
 Mallard_Button :: struct {
-	using uie:      Mallard_Element,
-	label:          ^Mallard_Label,
-	state:          Mallard_Button_State,
-	style:          Mallard_Button_Style,
-	selected_color: mc.Color,
-	draggable:      bool,
-	dragging:       bool,
-	on_click:       #type proc(),
+	using uie: Mallard_Element,
+	// label:     ^Mallard_Label,
+	text:      cstring,
+	state:     Mallard_Button_State,
+	style:     Mallard_Button_Style,
+	draggable: bool,
+	dragging:  bool,
+	on_click:  #type proc(),
 }
 
 Mallard_Label :: struct {

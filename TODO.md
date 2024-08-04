@@ -1,0 +1,36 @@
+# MALLARD TODOs
+
+- General
+  - [x] Define what will be user code and what will be library code
+  - [ ] Introduce a 2nd pass
+    - [ ] First Pass is for Building
+      - [ ] Remove positioning functionality from build pass
+      - [ ] Add to top container's children
+    - [ ] Second Pass is for figuring out Layout
+      - [ ] Position functionality from build pass
+  - [ ] Cache previous frame's data
+- Layout
+  - [ ] Element Minimum Size
+  - [x] Layout contain takes the largest minimum_size between itself and it's children elements
+  - [x] Element sizing behaviors
+    - [x] Fill
+    - [x] Begin
+    - [x] Center
+    - [x] End
+  - [ ] Layout padding
+  - [ ] Expand flag
+- Elements
+  - [ ] Icon button
+  - [ ] Checkbox Button
+  - [ ] Toggle Button
+  - [ ] Radio Button
+  - [ ] Slider
+  - [ ] TextInput
+  - [ ] Dropdown button
+  - [ ] Label
+  - [ ] Divider
+- Theme
+  - [ ] Only provide colors through a theme
+  - [ ] Define a theme file layout
+  - [ ] Save theme
+  - [ ] Load theme
