@@ -146,10 +146,12 @@ Mallard_Panel :: struct {
 
 Mallard_Container :: struct {
 	using uie: Mallard_Element,
+	space: mc.Vec2,
 }
 
 Mallard_Vertical_Container :: struct {
 	using uie: Mallard_Element,
 	alignment: Mallard_Vertical_Alignment,
 	fill:      bool,
+	space: mc.Vec2,
 }

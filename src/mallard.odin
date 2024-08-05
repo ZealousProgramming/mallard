@@ -1,13 +1,14 @@
 package mallard
 
-import "core:log"
 import q "core:container/queue"
+import "core:log"
 // import "core:mem"
 
 import mc "./common"
 
 frame_commands: [dynamic]^Mallard_Render_Command
 container_stack: q.Queue(^Mallard_Element)
+root_container: ^Mallard_Container
 
 test_min_size: mc.Vec2 = {25, 25}
 
@@ -36,6 +37,12 @@ mal_init :: proc() {
 
 mal_begin_frame :: proc() {
 	mal_clear_commands()
+	q.clear(&container_stack)
+	state.stack_position.x = 0.0
+	state.stack_position.y = 0.0
+
+	root_container = mal_layout(mc.Rect{0, 0, f32(state.screen_width), f32(state.screen_height)})
+	mal_push_container(root_container)
 }
 
 mal_end_frame :: proc() {
@@ -44,9 +51,9 @@ mal_end_frame :: proc() {
 }
 
 mal_resized :: proc(new_size: [2]i32) {
-    state.screen_width = new_size.x
-    state.screen_height = new_size.y
-    state.viewport_x = state.screen_width / 2 - state.viewport_width / 2
+	state.screen_width = new_size.x
+	state.screen_height = new_size.y
+	state.viewport_x = state.screen_width / 2 - state.viewport_width / 2
 }
 
 mal_deinit :: proc() {
@@ -65,7 +72,6 @@ mal_render :: proc() {
 	{
 		mc._clearBackground(state.component_bg_color)
 
-		// element_draw(ROOT_CONTAINER)
 		for rc in frame_commands {
 			if rc.draw == nil {continue}
 			rc.draw(rc.instance)
@@ -85,5 +91,5 @@ mal_clear_commands :: proc(allocator := context.allocator) {
 }
 
 mal_build_layout :: proc() {
-
+	mal_layout_calculate(root_container)
 }

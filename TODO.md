@@ -2,10 +2,10 @@
 
 - General
   - [x] Define what will be user code and what will be library code
-  - [ ] Introduce a 2nd pass
-    - [ ] First Pass is for Building
-      - [ ] Remove positioning functionality from build pass
-      - [ ] Add to top container's children
+  - [o] Introduce a 2nd pass
+    - [x] First Pass is for Building
+      - [x] Remove positioning functionality from build pass
+      - [x] Add to top container's children
     - [ ] Second Pass is for figuring out Layout
       - [ ] Position functionality from build pass
   - [ ] Cache previous frame's data

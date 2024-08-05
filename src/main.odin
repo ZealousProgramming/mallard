@@ -12,7 +12,6 @@ DEFAULT_VIEWPORT_WIDTH: i32 = 960
 DEFAULT_VIEWPORT_HEIGHT: i32 = 540
 track: mem.Tracking_Allocator
 
-
 cog_texture: mc.Texture
 
 
@@ -71,11 +70,10 @@ deinit :: proc(allocator := context.allocator) {
 	}
 }
 
-// NOTE(devon): Will be a user-land proc
 build_ui :: proc(delta_time: f32) {
-
 	vl := mal_vertical_layout(mc.Rect{100, 0, 200, f32(state.screen_height)}, .TOP)
 	mal_push_container(vl)
+
 	if mal_layout_button(test_min_size, .BEGIN, .CENTER, "Some Button") {
 		log.info("DA BUTTON BEEN HIT")
 	}

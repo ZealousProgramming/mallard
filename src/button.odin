@@ -91,8 +91,9 @@ mal_layout_button :: proc(
 	b.min_size = min_size
 	b.text, _ = strings.clone_to_cstring(t)
 	text_size := mc._measureTextEx(editor_font, b.text, f32(EDITOR_FONT_SIZE), EDITOR_FONT_SPACING)
-
 	desired_size := mc.Vec2{text_size.x + style.padding.x * 2, text_size.y + style.padding.y * 2}
+	desired_position := mc.Vec2{0.0, 0.0}
+
 	if b.min_size.x > desired_size.x {
 		desired_size.x = b.min_size.x
 	} else {
@@ -105,30 +106,34 @@ mal_layout_button :: proc(
 		b.min_size.y = desired_size.y
 	}
 
-	desired_position := mc.Vec2{0.0, 0.0}
+	// mal_container_size_check(b.min_size)
 
-	mal_container_size_check(b.min_size)
+	// if q.len(container_stack) > 0 {
+	// 	container := q.peek_back(&container_stack)^
+
+	// 	switch b.horizontal_sizing {
+	// 	case .FILL:
+	// 		{
+	// 			desired_size.x = container.rect.width
+	// 			b.min_size.x = desired_size.x
+	// 		}
+	// 	case .CENTER:
+	// 		{
+	// 			desired_position.x = container.rect.width / 2.0 - desired_size.x / 2.0
+	// 		}
+	// 	case .END:
+	// 		{
+	// 			desired_position.x = container.rect.width - desired_size.x
+	// 		}
+	// 	case .BEGIN:
+	// 		fallthrough
+	// 	}
+	// }
 
 	if q.len(container_stack) > 0 {
 		container := q.peek_back(&container_stack)^
-
-		switch b.horizontal_sizing {
-		case .FILL:
-			{
-				desired_size.x = container.rect.width
-				b.min_size.x = desired_size.x
-			}
-		case .CENTER:
-			{
-				desired_position.x = container.rect.width / 2.0 - desired_size.x / 2.0
-			}
-		case .END:
-			{
-				desired_position.x = container.rect.width - desired_size.x
-			}
-		case .BEGIN:
-			fallthrough
-		}
+		append(&container.children, b)
+		b.container = container
 	}
 
 	b.rect = mc.Rect {
@@ -138,7 +143,6 @@ mal_layout_button :: proc(
 		desired_size.y,
 	}
 
-
 	rc := new(Mallard_Render_Command, allocator)
 	rc.draw = button_draw
 	rc.deinit = button_free
@@ -147,7 +151,8 @@ mal_layout_button :: proc(
 	append(&frame_commands, rc)
 
 	under_mouse := is_element_under_mouse(b.rect)
-	clicked := is_mouse_button_pressed(mc.MouseButton.LEFT)
+	clicked :=
+		is_mouse_button_pressed(mc.MouseButton.LEFT) || is_mouse_button_down(mc.MouseButton.LEFT)
 
 	if under_mouse && clicked {
 		b.state = .SELECTED
@@ -184,7 +189,7 @@ mal_button :: proc(
 		b.min_size.y if b.min_size.y > desired_size.y else desired_size.y,
 	}
 
-	mal_container_size_check(b.min_size)
+	// mal_container_size_check(b.min_size)
 
 	rc := new(Mallard_Render_Command, allocator)
 	rc.draw = button_draw

@@ -64,6 +64,12 @@ element_variant :: proc(el: ^Mallard_Element, $T: typeid) -> (^T, Mallard_Ui_Err
 }
 
 element_basic_deinit :: proc(self: ^Mallard_Element, allocator := context.allocator) {
+	if self == nil {return}
+
+	if self.children != nil {
+		delete(self.children)
+	}
+
 	free(self, allocator)
 }
 
@@ -77,10 +83,10 @@ mal_pop_container :: proc() {
 	state.stack_position -= mc.Vec2{c.rect.x, c.rect.y}
 }
 
-mal_container_size_check :: proc(size: mc.Vec2) {
-	if q.len(container_stack) <= 0 {return}
-
-	container := q.peek_back(&container_stack)^
+mal_container_size_check :: proc(container: ^Mallard_Element, size: mc.Vec2) {
+	if container == nil {return}
+	// if q.len(container_stack) <= 0 {return}
+	// container := q.peek_back(&container_stack)^
 
 	if container.rect.width < size.x {
 		container.rect.width = size.x
@@ -88,6 +94,18 @@ mal_container_size_check :: proc(size: mc.Vec2) {
 
 	if container.rect.height < size.y {
 		container.rect.height = size.y
+	}
+
+
+	#partial switch v in container.variant {
+	case ^Mallard_Container:
+		{
+			v.space = mc.Vec2{container.rect.width, container.rect.height}
+		}
+	case ^Mallard_Vertical_Container:
+		{
+			v.space = mc.Vec2{container.rect.width, container.rect.height}
+		}
 	}
 }
 
@@ -112,15 +130,17 @@ mal_container_size_check :: proc(size: mc.Vec2) {
 // }
 
 
-// element_recalculate_global_position :: proc(self: ^Mallard_Element) -> mc.Vec2 {
-// 	if self.container == nil {
-// 		return self.transform.local
-// 	}
+element_recalculate_global_position :: proc(self: ^Mallard_Element) -> mc.Vec2 {
+	if self == nil {return mc.Vec2{0.0, 0.0}}
+	current := mc.Vec2{self.rect.x, self.rect.y}
+	if self.container == nil {
+		return current
+	}
 
-// 	container_p := element_recalculate_global_position(self.container)
+	container_p := element_recalculate_global_position(self.container)
 
-// 	return self.transform.local + container_p
-// }
+	return current + container_p
+}
 
 is_element_under_mouse :: proc(r: mc.Rect) -> bool {
 	mouse_position := get_mouse_position()
