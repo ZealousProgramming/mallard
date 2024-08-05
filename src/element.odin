@@ -1,7 +1,9 @@
 package mallard
 
-import mc "./common"
 import q "core:container/queue"
+// import "core:log"
+
+import mc "./common"
 
 
 // element_update :: proc(el: ^Mallard_Element, allocator := context.allocator) {
@@ -140,6 +142,29 @@ element_recalculate_global_position :: proc(self: ^Mallard_Element) -> mc.Vec2 {
 	container_p := element_recalculate_global_position(self.container)
 
 	return current + container_p
+}
+
+element_global_rect :: proc(self: ^Mallard_Element) -> mc.Rect {
+	if self == nil {return mc.Rect{}}
+
+	gp := element_recalculate_global_position(self)
+	return mc.Rect{gp.x, gp.y, self.rect.width, self.rect.height}
+}
+
+element_calculate_used_space_vertical :: proc(self: ^Mallard_Element) -> f32 {
+	if self == nil || self.children == nil || len(self.children) == 0 {return 0.0}
+
+	spaced_used: f32 = 0.0
+	#partial switch v in self.variant {
+	case ^Mallard_Vertical_Container:
+		{
+			for c in v.children {
+				spaced_used += c.rect.height + v.padding
+			}
+		}
+	}
+
+	return spaced_used
 }
 
 is_element_under_mouse :: proc(r: mc.Rect) -> bool {

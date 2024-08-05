@@ -10,8 +10,6 @@ frame_commands: [dynamic]^Mallard_Render_Command
 container_stack: q.Queue(^Mallard_Element)
 root_container: ^Mallard_Container
 
-test_min_size: mc.Vec2 = {25, 25}
-
 state := Mallard_State {
 	screen_width = DEFAULT_WINDOW_WIDTH,
 	screen_height = DEFAULT_WINDOW_HEIGHT,

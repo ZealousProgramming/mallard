@@ -54,14 +54,14 @@ Mallard_Vertical_Alignment :: enum {
 }
 
 Mallard_Element :: struct {
-	rect:      mc.Rect,
-	min_size:  mc.Vec2,
-	vertical_sizing: Mallard_Sizing_Behavior,
+	rect:              mc.Rect,
+	min_size:          mc.Vec2,
+	vertical_sizing:   Mallard_Sizing_Behavior,
 	horizontal_sizing: Mallard_Sizing_Behavior,
 	// Weak
-	container: ^Mallard_Element,
-	children:  [dynamic]^Mallard_Element,
-	variant:   union {
+	container:         ^Mallard_Element,
+	children:          [dynamic]^Mallard_Element,
+	variant:           union {
 		^Mallard_Window,
 		^Mallard_ScrollBox,
 		^Mallard_Scrollbar,
@@ -74,6 +74,7 @@ Mallard_Element :: struct {
 		^Mallard_Panel,
 		^Mallard_Container,
 		^Mallard_Vertical_Container,
+		^Mallard_Horizontal_Container,
 	},
 }
 
@@ -146,12 +147,21 @@ Mallard_Panel :: struct {
 
 Mallard_Container :: struct {
 	using uie: Mallard_Element,
-	space: mc.Vec2,
+	space:     mc.Vec2,
 }
 
 Mallard_Vertical_Container :: struct {
 	using uie: Mallard_Element,
 	alignment: Mallard_Vertical_Alignment,
+	padding:   f32,
 	fill:      bool,
-	space: mc.Vec2,
+	space:     mc.Vec2,
+}
+
+Mallard_Horizontal_Container :: struct {
+	using uie: Mallard_Element,
+	alignment: Mallard_Horizontal_Alignment,
+	padding:   f32,
+	fill:      bool,
+	space:     mc.Vec2,
 }

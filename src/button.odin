@@ -39,12 +39,14 @@ button_draw :: proc(self: ^Mallard_Element) {
 		color = el.style.pressed_color
 	}
 	rl.DrawRectangleRounded(el.rect, el.style.roundness, i32(el.style.segments), color)
-	rl.DrawRectangleRounded(
-		mc.Rect{el.rect.x, el.rect.y, el.min_size.x, el.min_size.y},
-		el.style.roundness,
-		i32(el.style.segments),
-		DEBUG_BOUNDING_BOX_COLOR,
-	)
+	if DRAW_DEBUG_BOX {
+		rl.DrawRectangleRounded(
+			mc.Rect{el.rect.x, el.rect.y, el.min_size.x, el.min_size.y},
+			el.style.roundness,
+			i32(el.style.segments),
+			DEBUG_BOUNDING_BOX_COLOR,
+		)
+	}
 
 	if el.text == nil {return}
 	text_size := mc._measureTextEx(
@@ -134,6 +136,8 @@ mal_layout_button :: proc(
 		container := q.peek_back(&container_stack)^
 		append(&container.children, b)
 		b.container = container
+
+		mal_container_size_check(container, b.min_size)
 	}
 
 	b.rect = mc.Rect {
@@ -198,7 +202,7 @@ mal_button :: proc(
 
 	append(&frame_commands, rc)
 
-	under_mouse := is_element_under_mouse(b.rect)
+	under_mouse := is_element_under_mouse(element_global_rect(b))
 	clicked := is_mouse_button_pressed(mc.MouseButton.LEFT)
 
 	if under_mouse && clicked {

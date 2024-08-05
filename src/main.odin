@@ -13,7 +13,8 @@ DEFAULT_VIEWPORT_HEIGHT: i32 = 540
 track: mem.Tracking_Allocator
 
 cog_texture: mc.Texture
-
+test_min_size: mc.Vec2 = {25, 25}
+test_vertical_alignment: Mallard_Vertical_Alignment = .TOP
 
 main :: proc() {
 	mem.tracking_allocator_init(&track, context.allocator)
@@ -71,11 +72,22 @@ deinit :: proc(allocator := context.allocator) {
 }
 
 build_ui :: proc(delta_time: f32) {
-	vl := mal_vertical_layout(mc.Rect{100, 0, 200, f32(state.screen_height)}, .TOP)
+	vl := mal_vertical_layout(
+		mc.Rect{100, 0, 200, f32(state.screen_height)},
+		test_vertical_alignment,
+	)
 	mal_push_container(vl)
 
-	if mal_layout_button(test_min_size, .BEGIN, .CENTER, "Some Button") {
-		log.info("DA BUTTON BEEN HIT")
+	if mal_layout_button(mc.Vec2{32, 32}, .BEGIN, .CENTER, "First Button") {
+		log.info("First button has been hit")
+	}
+
+	if mal_layout_button(test_min_size, .BEGIN, .CENTER, "Second Button") {
+		log.info("Second button has been hit")
+	}
+
+	if mal_layout_button(mc.Vec2{32, 32}, .BEGIN, .CENTER, "Third Button") {
+		log.info("Third button has been hit")
 	}
 
 	// v2 := mal_vertical_layout(mc.Rect{50, 100, 200, f32(state.screen_height - 100)}, .TOP)
@@ -98,5 +110,15 @@ build_ui :: proc(delta_time: f32) {
 	}
 	if mal_button(mc.Vec2{80, 230}, mc.Vec2{25, 25}, "+y") {
 		test_min_size.y += inc
+	}
+	// Vertical Alignment
+	if mal_button(mc.Vec2{10, 300}, mc.Vec2{25, 25}, "TOP") {
+		test_vertical_alignment = .TOP
+	}
+	if mal_button(mc.Vec2{60, 300}, mc.Vec2{25, 25}, "CENTER") {
+		test_vertical_alignment = .CENTER
+	}
+	if mal_button(mc.Vec2{135, 300}, mc.Vec2{25, 25}, "BOTTOM") {
+		test_vertical_alignment = .BOTTOM
 	}
 }
