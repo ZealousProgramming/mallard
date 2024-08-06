@@ -68,7 +68,11 @@ deinit :: proc(allocator := context.allocator) {
 	}
 
 	for bad_free in track.bad_free_array {
-		fmt.eprintf("%p allocation %p was freed incorrectly\n", bad_free.location, bad_free.memory)
+		fmt.eprintf(
+			"%p allocation %p was freed incorrectly\n",
+			bad_free.location,
+			bad_free.memory,
+		)
 	}
 }
 
@@ -85,15 +89,33 @@ build_ui :: proc(delta_time: f32) {
 	)
 	mal_push_container(hl)
 
-	if mal_layout_button(mal_hash(0), mc.Vec2{32, 32}, .CENTER, .CENTER, "First Button") {
+	if mal_layout_button(
+		   mal_hash(0),
+		   mc.Vec2{32, 32},
+		   .CENTER,
+		   .CENTER,
+		   "First Button",
+	   ) {
 		log.info("First button has been hit")
 	}
 
-	if mal_layout_button(mal_hash(0), test_min_size, .CENTER, .CENTER, "Second Button") {
+	if mal_layout_button(
+		   mal_hash(0),
+		   test_min_size,
+		   .CENTER,
+		   .CENTER,
+		   "Second Button",
+	   ) {
 		log.info("Second button has been hit")
 	}
 
-	if mal_layout_button(mal_hash(0), mc.Vec2{32, 32}, .CENTER, .CENTER, "Third Button") {
+	if mal_layout_button(
+		   mal_hash(0),
+		   mc.Vec2{32, 32},
+		   .CENTER,
+		   .CENTER,
+		   "Third Button",
+	   ) {
 		log.info("Third button has been hit")
 	}
 	mal_pop_container()
@@ -114,18 +136,39 @@ build_ui :: proc(delta_time: f32) {
 	}
 
 	// Vertical Alignment
-	alh := mal_horizontal_layout(mc.Rect{0, 0, f32(state.screen_width), 200}, .LEFT)
+	alh := mal_horizontal_layout(
+		mc.Rect{0, 0, f32(state.screen_width), 200},
+		.LEFT,
+	)
 	mal_push_container(alh)
 
-	if mal_layout_button(mal_hash(0), mc.Vec2{25, 25}, .CENTER, .CENTER, "LEFT") {
+	if mal_layout_button(
+		   mal_hash(0),
+		   mc.Vec2{25, 25},
+		   .CENTER,
+		   .CENTER,
+		   "LEFT",
+	   ) {
 		// test_vertical_alignment = .TOP
 		test_horizontal_alignment = .LEFT
 	}
-	if mal_layout_button(mal_hash(0), mc.Vec2{25, 25}, .CENTER, .CENTER, "CENTER") {
+	if mal_layout_button(
+		   mal_hash(0),
+		   mc.Vec2{25, 25},
+		   .CENTER,
+		   .CENTER,
+		   "CENTER",
+	   ) {
 		// test_vertical_alignment = .CENTER
 		test_horizontal_alignment = .CENTER
 	}
-	if mal_layout_button(mal_hash(0), mc.Vec2{25, 25}, .CENTER, .CENTER, "RIGHT") {
+	if mal_layout_button(
+		   mal_hash(0),
+		   mc.Vec2{25, 25},
+		   .CENTER,
+		   .CENTER,
+		   "RIGHT",
+	   ) {
 		// test_vertical_alignment = .BOTTOM
 		test_horizontal_alignment = .RIGHT
 	}

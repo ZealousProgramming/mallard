@@ -209,5 +209,7 @@ mal_button :: proc(
 
 	append(&frame_commands, rc)
 
+	element_interaction(b)
+
 	return b.state == .SELECTED
 }
