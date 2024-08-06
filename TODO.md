@@ -2,22 +2,22 @@
 
 - General
   - [x] Define what will be user code and what will be library code
-  - [o] Introduce a 2nd pass
+  - [x] Introduce a 2nd pass
     - [x] First Pass is for Building
       - [x] Remove positioning functionality from build pass
       - [x] Add to top container's children
-    - [ ] Second Pass is for figuring out Layout
-      - [ ] Position functionality from build pass
+    - [x] Second Pass is for figuring out Layout
+      - [x] Position functionality from build pass
   - [ ] Cache previous frame's data
 - Layout
-  - [ ] Element Minimum Size
+  - [x] Element Minimum Size
   - [x] Layout contain takes the largest minimum_size between itself and it's children elements
   - [x] Element sizing behaviors
     - [x] Fill
     - [x] Begin
     - [x] Center
     - [x] End
-  - [ ] Layout padding
+  - [x] Layout padding
   - [ ] Expand flag
 - Elements
   - [ ] Icon button

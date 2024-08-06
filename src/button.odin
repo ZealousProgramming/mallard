@@ -1,8 +1,11 @@
 package mallard
 
-import mc "./common"
+
 import q "core:container/queue"
+// import "core:log"
 import "core:strings"
+
+import mc "./common"
 import rl "vendor:raylib"
 
 Mallard_Button_Style :: struct {
@@ -19,6 +22,10 @@ Mallard_Button_Style :: struct {
 
 button_free :: proc(self: ^Mallard_Element, allocator := context.allocator) {
 	el, _ := element_variant(self, Mallard_Button)
+	if el.hash != "" {
+		delete(el.hash)
+	}
+
 	if el.text != nil {
 		delete(el.text)
 	}
@@ -38,7 +45,12 @@ button_draw :: proc(self: ^Mallard_Element) {
 	case .SELECTED:
 		color = el.style.pressed_color
 	}
-	rl.DrawRectangleRounded(el.rect, el.style.roundness, i32(el.style.segments), color)
+	rl.DrawRectangleRounded(
+		el.rect,
+		el.style.roundness,
+		i32(el.style.segments),
+		color,
+	)
 	if DRAW_DEBUG_BOX {
 		rl.DrawRectangleRounded(
 			mc.Rect{el.rect.x, el.rect.y, el.min_size.x, el.min_size.y},
@@ -77,6 +89,7 @@ button_draw :: proc(self: ^Mallard_Element) {
 }
 
 mal_layout_button :: proc(
+	hash: string,
 	min_size: mc.Vec2,
 	vertical: Mallard_Sizing_Behavior,
 	horizontal: Mallard_Sizing_Behavior,
@@ -86,14 +99,23 @@ mal_layout_button :: proc(
 ) -> bool {
 	b := new(Mallard_Button, allocator)
 
+	b.hash = hash
 	b.variant = b
 	b.style = style
 	b.horizontal_sizing = horizontal
 	b.vertical_sizing = vertical
 	b.min_size = min_size
 	b.text, _ = strings.clone_to_cstring(t)
-	text_size := mc._measureTextEx(editor_font, b.text, f32(EDITOR_FONT_SIZE), EDITOR_FONT_SPACING)
-	desired_size := mc.Vec2{text_size.x + style.padding.x * 2, text_size.y + style.padding.y * 2}
+	text_size := mc._measureTextEx(
+		editor_font,
+		b.text,
+		f32(EDITOR_FONT_SIZE),
+		EDITOR_FONT_SPACING,
+	)
+	desired_size := mc.Vec2 {
+		text_size.x + style.padding.x * 2,
+		text_size.y + style.padding.y * 2,
+	}
 	desired_position := mc.Vec2{0.0, 0.0}
 
 	if b.min_size.x > desired_size.x {
@@ -107,30 +129,6 @@ mal_layout_button :: proc(
 	} else {
 		b.min_size.y = desired_size.y
 	}
-
-	// mal_container_size_check(b.min_size)
-
-	// if q.len(container_stack) > 0 {
-	// 	container := q.peek_back(&container_stack)^
-
-	// 	switch b.horizontal_sizing {
-	// 	case .FILL:
-	// 		{
-	// 			desired_size.x = container.rect.width
-	// 			b.min_size.x = desired_size.x
-	// 		}
-	// 	case .CENTER:
-	// 		{
-	// 			desired_position.x = container.rect.width / 2.0 - desired_size.x / 2.0
-	// 		}
-	// 	case .END:
-	// 		{
-	// 			desired_position.x = container.rect.width - desired_size.x
-	// 		}
-	// 	case .BEGIN:
-	// 		fallthrough
-	// 	}
-	// }
 
 	if q.len(container_stack) > 0 {
 		container := q.peek_back(&container_stack)^
@@ -156,7 +154,8 @@ mal_layout_button :: proc(
 
 	under_mouse := is_element_under_mouse(b.rect)
 	clicked :=
-		is_mouse_button_pressed(mc.MouseButton.LEFT) || is_mouse_button_down(mc.MouseButton.LEFT)
+		is_mouse_button_pressed(mc.MouseButton.LEFT) ||
+		is_mouse_button_down(mc.MouseButton.LEFT)
 
 	if under_mouse && clicked {
 		b.state = .SELECTED
@@ -182,9 +181,17 @@ mal_button :: proc(
 	b.style = style
 	b.min_size = min_size
 	b.text, _ = strings.clone_to_cstring(t)
-	text_size := mc._measureTextEx(editor_font, b.text, f32(EDITOR_FONT_SIZE), EDITOR_FONT_SPACING)
+	text_size := mc._measureTextEx(
+		editor_font,
+		b.text,
+		f32(EDITOR_FONT_SIZE),
+		EDITOR_FONT_SPACING,
+	)
 
-	desired_size := mc.Vec2{text_size.x + style.padding.x * 2, text_size.y + style.padding.y * 2}
+	desired_size := mc.Vec2 {
+		text_size.x + style.padding.x * 2,
+		text_size.y + style.padding.y * 2,
+	}
 
 	b.rect = mc.Rect {
 		position.x + state.stack_position.x,
@@ -201,17 +208,6 @@ mal_button :: proc(
 	rc.instance = b
 
 	append(&frame_commands, rc)
-
-	under_mouse := is_element_under_mouse(element_global_rect(b))
-	clicked := is_mouse_button_pressed(mc.MouseButton.LEFT)
-
-	if under_mouse && clicked {
-		b.state = .SELECTED
-	} else if under_mouse && !clicked {
-		b.state = .HOVER
-	} else {
-		b.state = .NORMAL
-	}
 
 	return b.state == .SELECTED
 }

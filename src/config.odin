@@ -25,7 +25,7 @@ DEFAULT_THEME :: Mallard_Theme {
 DEFAULT_BUTTON_STYLE := Mallard_Button_Style {
 	normal_color = DEFAULT_THEME.accent,
 	hover_color = DEFAULT_THEME.light,
-	pressed_color = DEFAULT_THEME.dark,
+	pressed_color = DEFAULT_THEME.night,
 	text_color = DEFAULT_THEME.text,
 	padding = mc.Vec2{8, 2},
 	segments = 12,

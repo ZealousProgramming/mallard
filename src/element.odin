@@ -1,9 +1,8 @@
 package mallard
 
-import q "core:container/queue"
-// import "core:log"
-
 import mc "./common"
+import q "core:container/queue"
+import "core:fmt"
 
 
 // element_update :: proc(el: ^Mallard_Element, allocator := context.allocator) {
@@ -52,7 +51,13 @@ import mc "./common"
 // 	}
 // }
 
-element_variant :: proc(el: ^Mallard_Element, $T: typeid) -> (^T, Mallard_Ui_Error) {
+element_variant :: proc(
+	el: ^Mallard_Element,
+	$T: typeid,
+) -> (
+	^T,
+	Mallard_Ui_Error,
+) {
 	if el == nil {return nil, .TYPE_NOT_FOUND}
 
 	#partial switch el in el.variant {
@@ -65,7 +70,10 @@ element_variant :: proc(el: ^Mallard_Element, $T: typeid) -> (^T, Mallard_Ui_Err
 	return nil, .TYPE_NOT_FOUND
 }
 
-element_basic_deinit :: proc(self: ^Mallard_Element, allocator := context.allocator) {
+element_basic_deinit :: proc(
+	self: ^Mallard_Element,
+	allocator := context.allocator,
+) {
 	if self == nil {return}
 
 	if self.children != nil {
@@ -132,7 +140,9 @@ mal_container_size_check :: proc(container: ^Mallard_Element, size: mc.Vec2) {
 // }
 
 
-element_recalculate_global_position :: proc(self: ^Mallard_Element) -> mc.Vec2 {
+element_recalculate_global_position :: proc(
+	self: ^Mallard_Element,
+) -> mc.Vec2 {
 	if self == nil {return mc.Vec2{0.0, 0.0}}
 	current := mc.Vec2{self.rect.x, self.rect.y}
 	if self.container == nil {
@@ -152,7 +162,9 @@ element_global_rect :: proc(self: ^Mallard_Element) -> mc.Rect {
 }
 
 element_calculate_used_space_vertical :: proc(self: ^Mallard_Element) -> f32 {
-	if self == nil || self.children == nil || len(self.children) == 0 {return 0.0}
+	if self == nil ||
+	   self.children == nil ||
+	   len(self.children) == 0 {return 0.0}
 
 	spaced_used: f32 = 0.0
 	#partial switch v in self.variant {
@@ -165,6 +177,44 @@ element_calculate_used_space_vertical :: proc(self: ^Mallard_Element) -> f32 {
 	}
 
 	return spaced_used
+}
+
+element_calculate_used_space_horizontal :: proc(
+	self: ^Mallard_Element,
+) -> f32 {
+	if self == nil ||
+	   self.children == nil ||
+	   len(self.children) == 0 {return 0.0}
+
+	spaced_used: f32 = 0.0
+	#partial switch v in self.variant {
+	case ^Mallard_Horizontal_Container:
+		{
+			for c in v.children {
+				spaced_used += c.rect.width + v.padding
+			}
+		}
+	}
+
+	return spaced_used
+}
+
+element_interaction :: proc(self: ^Mallard_Element) {
+	#partial switch v in self.variant {
+	case ^Mallard_Button:
+		{
+			under_mouse := is_element_under_mouse(element_global_rect(v))
+			clicked := is_mouse_button_pressed(mc.MouseButton.LEFT)
+
+			if under_mouse && clicked {
+				v.state = .SELECTED
+			} else if under_mouse && !clicked {
+				v.state = .HOVER
+			} else {
+				v.state = .NORMAL
+			}
+		}
+	}
 }
 
 is_element_under_mouse :: proc(r: mc.Rect) -> bool {
@@ -180,4 +230,18 @@ is_element_under_mouse :: proc(r: mc.Rect) -> bool {
 
 	return mc._checkCollisionRecs(r, mouse_rect)
 
+}
+
+mal_hash :: #force_inline proc(
+	index: int,
+	allocator := context.allocator,
+	location := #caller_location,
+) -> string {
+	return fmt.aprintf(
+		"%s-%s-%v",
+		location.file_path,
+		location.line,
+		index,
+		allocator,
+	)
 }

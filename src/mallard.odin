@@ -9,6 +9,7 @@ import mc "./common"
 frame_commands: [dynamic]^Mallard_Render_Command
 container_stack: q.Queue(^Mallard_Element)
 root_container: ^Mallard_Container
+// frame_data: map[
 
 state := Mallard_State {
 	screen_width = DEFAULT_WINDOW_WIDTH,
@@ -25,7 +26,12 @@ state := Mallard_State {
 mal_init :: proc() {
 	log.info("[Mallard][init]")
 
-	editor_font = mc._loadFontEx("./assets/zed-mono/zed-mono-semibold.ttf", i32(32), nil, 0)
+	editor_font = mc._loadFontEx(
+		"./assets/zed-mono/zed-mono-semibold.ttf",
+		i32(32),
+		nil,
+		0,
+	)
 	mc._setTextureFilter(editor_font.texture, mc.TextureFilter.BILINEAR)
 
 	q.init(&container_stack)
@@ -39,7 +45,9 @@ mal_begin_frame :: proc() {
 	state.stack_position.x = 0.0
 	state.stack_position.y = 0.0
 
-	root_container = mal_layout(mc.Rect{0, 0, f32(state.screen_width), f32(state.screen_height)})
+	root_container = mal_layout(
+		mc.Rect{0, 0, f32(state.screen_width), f32(state.screen_height)},
+	)
 	mal_push_container(root_container)
 }
 
@@ -75,7 +83,7 @@ mal_render :: proc() {
 			rc.draw(rc.instance)
 		}
 
-		mc._drawTexture(cog_texture, 100, 100, DEFAULT_THEME.accent)
+		// mc._drawTexture(cog_texture, 100, 100, DEFAULT_THEME.accent)
 	}
 	mc._endDrawing()
 }

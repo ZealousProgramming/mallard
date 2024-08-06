@@ -1,5 +1,6 @@
 package mallard
 import mc "./common"
+import base "base:runtime"
 import c "core:c"
 import "core:mem"
 
@@ -9,6 +10,11 @@ Mallard_State :: struct {
 	viewport_x, viewport_y, viewport_width, viewport_height: c.int,
 	mouse_position:                                          mc.Vec2,
 	stack_position:                                          mc.Vec2,
+}
+
+Mallard_Hash :: struct {
+	location: base.Source_Code_Location,
+	index:    int,
 }
 
 Mallard_Render_Command :: struct {
@@ -54,6 +60,8 @@ Mallard_Vertical_Alignment :: enum {
 }
 
 Mallard_Element :: struct {
+	hashie:            Mallard_Hash,
+	hash:              string,
 	rect:              mc.Rect,
 	min_size:          mc.Vec2,
 	vertical_sizing:   Mallard_Sizing_Behavior,
