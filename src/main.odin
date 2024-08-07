@@ -77,17 +77,18 @@ deinit :: proc(allocator := context.allocator) {
 }
 
 build_ui :: proc(delta_time: f32) {
-	//vl := mal_vertical_layout(
-	//	mc.Rect{300, 0, 200, f32(state.screen_height)},
-	//	test_vertical_alignment,
-	//)
-	//mal_push_container(vl)
-
 	hl := mal_horizontal_layout(
 		mc.Rect{0, 0, f32(state.screen_width), 100},
 		test_horizontal_alignment,
 	)
 	mal_push_container(hl)
+
+	vl := mal_vertical_layout(
+		mc.Rect{600, 0, 200, f32(state.screen_height)},
+		test_vertical_alignment,
+	)
+	mal_push_container(vl)
+
 
 	if mal_layout_button(
 		mal_id(),
@@ -119,13 +120,13 @@ build_ui :: proc(delta_time: f32) {
 		log.info("Third button has been hit")
 	}
 	mal_pop_container()
-	//mal_pop_container()
+	mal_pop_container()
 
-	vl := mal_vertical_layout(
+	svl := mal_vertical_layout(
 		mc.Rect{500, 300, 200, f32(state.screen_height - 300)},
 		test_vertical_alignment,
 	)
-	mal_push_container(vl)
+	mal_push_container(svl)
 
 	if mal_layout_button(
 		mal_id(),
@@ -172,7 +173,7 @@ build_ui :: proc(delta_time: f32) {
 
 	// Horizontal Alignment
 	alh := mal_horizontal_layout(
-		mc.Rect{0, 0, f32(state.screen_width), 200},
+		mc.Rect{0, 200, f32(state.screen_width), 200},
 		.LEFT,
 	)
 	mal_push_container(alh)
