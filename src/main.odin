@@ -77,20 +77,20 @@ deinit :: proc(allocator := context.allocator) {
 }
 
 build_ui :: proc(delta_time: f32) {
-	vl := mal_vertical_layout(
-		mc.Rect{300, 0, 200, f32(state.screen_height)},
-		test_vertical_alignment,
-	)
-	mal_push_container(vl)
-
-	//hl := mal_horizontal_layout(
-	//	mc.Rect{0, 100, f32(state.screen_width), 200},
-	//	test_horizontal_alignment,
+	//vl := mal_vertical_layout(
+	//	mc.Rect{300, 0, 200, f32(state.screen_height)},
+	//	test_vertical_alignment,
 	//)
-	//mal_push_container(hl)
+	//mal_push_container(vl)
+
+	hl := mal_horizontal_layout(
+		mc.Rect{0, 0, f32(state.screen_width), 100},
+		test_horizontal_alignment,
+	)
+	mal_push_container(hl)
 
 	if mal_layout_button(
-		mal_id(0),
+		mal_id(),
 		mc.Vec2{32, 32},
 		.CENTER,
 		.CENTER,
@@ -100,7 +100,7 @@ build_ui :: proc(delta_time: f32) {
 	}
 
 	if mal_layout_button(
-		mal_id(0),
+		mal_id(),
 		test_min_size,
 		.CENTER,
 		.CENTER,
@@ -110,7 +110,7 @@ build_ui :: proc(delta_time: f32) {
 	}
 
 	if mal_layout_button(
-		mal_id(0),
+		mal_id(),
 		mc.Vec2{32, 32},
 		.CENTER,
 		.CENTER,
@@ -121,39 +121,68 @@ build_ui :: proc(delta_time: f32) {
 	mal_pop_container()
 	//mal_pop_container()
 
+	vl := mal_vertical_layout(
+		mc.Rect{500, 300, 200, f32(state.screen_height - 300)},
+		test_vertical_alignment,
+	)
+	mal_push_container(vl)
+
+	if mal_layout_button(
+		mal_id(),
+		mc.Vec2{32, 32},
+		.CENTER,
+		.CENTER,
+		"First Button",
+	) {
+		log.info("First button has been hit")
+	}
+
+	if mal_layout_button(
+		mal_id(),
+		test_min_size,
+		.CENTER,
+		.CENTER,
+		"Second Button",
+	) {
+		log.info("Second button has been hit")
+	}
+
+
+	mal_pop_container()
+
+
+	min_size_lo := mal_horizontal_layout(mc.Rect{50, 400, 100, 45}, .LEFT)
+	mal_push_container(min_size_lo)
+
 	inc: f32 = 10.0
-	if mal_button(mc.Vec2{50, 200}, mc.Vec2{25, 25}, "-x") {
+	if mal_layout_button(mal_id(), mc.Vec2{32, 32}, .CENTER, .CENTER, "-x") {
 		test_min_size.x -= inc
 	}
-	if mal_button(mc.Vec2{50, 230}, mc.Vec2{25, 25}, "-y") {
+	if mal_layout_button(mal_id(), mc.Vec2{32, 32}, .CENTER, .CENTER, "-y") {
 		test_min_size.y -= inc
 	}
-	if mal_button(mc.Vec2{80, 200}, mc.Vec2{25, 25}, "+x") {
+	if mal_layout_button(mal_id(), mc.Vec2{32, 32}, .CENTER, .CENTER, "+x") {
 		test_min_size.x += inc
 	}
-	if mal_button(mc.Vec2{80, 230}, mc.Vec2{25, 25}, "+y") {
+	if mal_layout_button(mal_id(), mc.Vec2{32, 32}, .CENTER, .CENTER, "+y") {
 		test_min_size.y += inc
 	}
 
-	// Vertical Alignment
+	mal_pop_container()
+
+	// Horizontal Alignment
 	alh := mal_horizontal_layout(
 		mc.Rect{0, 0, f32(state.screen_width), 200},
 		.LEFT,
 	)
 	mal_push_container(alh)
 
-	if mal_layout_button(
-		mal_id(0),
-		mc.Vec2{25, 25},
-		.CENTER,
-		.CENTER,
-		"LEFT",
-	) {
+	if mal_layout_button(mal_id(), mc.Vec2{25, 25}, .CENTER, .CENTER, "LEFT") {
 		// test_vertical_alignment = .TOP
 		test_horizontal_alignment = .LEFT
 	}
 	if mal_layout_button(
-		mal_id(0),
+		mal_id(),
 		mc.Vec2{25, 25},
 		.CENTER,
 		.CENTER,
@@ -163,7 +192,7 @@ build_ui :: proc(delta_time: f32) {
 		test_horizontal_alignment = .CENTER
 	}
 	if mal_layout_button(
-		mal_id(0),
+		mal_id(),
 		mc.Vec2{25, 25},
 		.CENTER,
 		.CENTER,
@@ -173,4 +202,36 @@ build_ui :: proc(delta_time: f32) {
 		test_horizontal_alignment = .RIGHT
 	}
 	mal_pop_container()
+
+
+	// Vertical Alignment
+	alv := mal_horizontal_layout(
+		mc.Rect{0, 600, f32(state.screen_width), 200},
+		.LEFT,
+	)
+	mal_push_container(alv)
+
+	if mal_layout_button(mal_id(), mc.Vec2{25, 25}, .CENTER, .CENTER, "TOP") {
+		test_vertical_alignment = .TOP
+	}
+	if mal_layout_button(
+		mal_id(),
+		mc.Vec2{25, 25},
+		.CENTER,
+		.CENTER,
+		"CENTER",
+	) {
+		test_vertical_alignment = .CENTER
+	}
+	if mal_layout_button(
+		mal_id(),
+		mc.Vec2{25, 25},
+		.CENTER,
+		.CENTER,
+		"RIGHT",
+	) {
+		test_vertical_alignment = .BOTTOM
+	}
+	mal_pop_container()
+
 }

@@ -155,8 +155,6 @@ mal_layout_button :: proc(
 	execute_callback := false
 	if state.active_element_id == b.id {
 		b.state = .DOWN
-		//log.info(state.input_state.mouse_left)
-
 	} else if state.hot_element_id == b.id {
 		b.state = .HOVER
 

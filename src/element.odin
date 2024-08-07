@@ -247,7 +247,7 @@ is_element_under_mouse :: proc(r: mc.Rect) -> bool {
 }
 
 mal_id :: #force_inline proc(
-	index: int,
+	index: int = 0,
 	allocator := context.allocator,
 	location := #caller_location,
 ) -> Mallard_Id {
