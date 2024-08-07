@@ -8,7 +8,11 @@
       - [x] Add to top container's children
     - [x] Second Pass is for figuring out Layout
       - [x] Position functionality from build pass
-  - [ ] Cache previous frame's data
+  - [o] Cache previous frame's data
+    - [o] Frame Data
+    - [x] Make additions to the Mallard_Element
+    - [ ] Connect the generation of hashes
+    - [x] Create hash to use as a key
 - Layout
   - [x] Element Minimum Size
   - [x] Layout contain takes the largest minimum_size between itself and it's children elements

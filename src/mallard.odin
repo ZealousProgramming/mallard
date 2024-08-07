@@ -9,18 +9,19 @@ import mc "./common"
 frame_commands: [dynamic]^Mallard_Render_Command
 container_stack: q.Queue(^Mallard_Element)
 root_container: ^Mallard_Container
-// frame_data: map[
+frame_data: map[string]^Mallard_Element
 
 state := Mallard_State {
-	screen_width = DEFAULT_WINDOW_WIDTH,
-	screen_height = DEFAULT_WINDOW_HEIGHT,
-	viewport_width = DEFAULT_VIEWPORT_WIDTH,
-	viewport_height = DEFAULT_VIEWPORT_HEIGHT,
-	viewport_x = DEFAULT_WINDOW_WIDTH / 2 - DEFAULT_VIEWPORT_WIDTH / 2,
-	viewport_y = 32,
+	screen_width       = DEFAULT_WINDOW_WIDTH,
+	screen_height      = DEFAULT_WINDOW_HEIGHT,
+	viewport_width     = DEFAULT_VIEWPORT_WIDTH,
+	viewport_height    = DEFAULT_VIEWPORT_HEIGHT,
+	viewport_x         = DEFAULT_WINDOW_WIDTH / 2 - DEFAULT_VIEWPORT_WIDTH / 2,
+	viewport_y         = 32,
 	component_bg_color = {48, 48, 48, 255},
-	viewport_bg_color = {24, 24, 24, 255},
-	stack_position = mc.Vec2{0.0, 0.0},
+	viewport_bg_color  = {24, 24, 24, 255},
+	stack_position     = mc.Vec2{0.0, 0.0},
+	input_state        = {},
 }
 
 mal_init :: proc() {
@@ -45,6 +46,7 @@ mal_begin_frame :: proc() {
 	state.stack_position.x = 0.0
 	state.stack_position.y = 0.0
 
+	//log.infof("Active Element: %v\n", state.active_element_id)
 	root_container = mal_layout(
 		mc.Rect{0, 0, f32(state.screen_width), f32(state.screen_height)},
 	)
@@ -52,6 +54,17 @@ mal_begin_frame :: proc() {
 }
 
 mal_end_frame :: proc() {
+	state.input_state.mouse_position = get_mouse_position()
+	if is_mouse_button_released(mc.MouseButton.LEFT) {
+		state.input_state.mouse_left = .RELEASED
+	} else if is_mouse_button_pressed(mc.MouseButton.LEFT) {
+		state.input_state.mouse_left = .PRESSED
+	} else if is_mouse_button_down(mc.MouseButton.LEFT) {
+		state.input_state.mouse_left = .DOWN
+	} else {
+		state.input_state.mouse_left = .NIL
+	}
+
 	mal_build_layout()
 	mal_render()
 }
@@ -64,6 +77,9 @@ mal_resized :: proc(new_size: [2]i32) {
 
 mal_deinit :: proc() {
 	log.info("[Mallard][deinit]")
+
+	mal_delete_id(state.hot_element_id)
+	mal_delete_id(state.active_element_id)
 
 	mal_clear_commands()
 	delete(frame_commands)

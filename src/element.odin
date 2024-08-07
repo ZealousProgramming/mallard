@@ -3,6 +3,8 @@ package mallard
 import mc "./common"
 import q "core:container/queue"
 import "core:fmt"
+//import "core:log"
+import "core:strings"
 
 
 // element_update :: proc(el: ^Mallard_Element, allocator := context.allocator) {
@@ -203,22 +205,34 @@ element_interaction :: proc(self: ^Mallard_Element) {
 	#partial switch v in self.variant {
 	case ^Mallard_Button:
 		{
-			under_mouse := is_element_under_mouse(element_global_rect(v))
-			clicked := is_mouse_button_pressed(mc.MouseButton.LEFT)
+			under_mouse := is_element_under_mouse(v.rect)
+			clicked :=
+				state.input_state.mouse_left == .PRESSED ||
+				state.input_state.mouse_left == .DOWN
+			released := state.input_state.mouse_left == .RELEASED
 
-			if under_mouse && clicked {
-				v.state = .SELECTED
-			} else if under_mouse && !clicked {
-				v.state = .HOVER
-			} else {
-				v.state = .NORMAL
+			if under_mouse && clicked && state.active_element_id != v.id {
+				mal_active_element(v.id)
+				//log.infof("Active Element: %v\n", state.active_element_id)
+			} else if under_mouse && state.hot_element_id != v.id {
+				mal_hot_element(v.id)
+				//log.infof("Hot Element: %v\n", state.hot_element_id)
+			} else if !clicked && released && state.active_element_id == v.id {
+				mal_active_element("")
+				//log.infof("Active Element: %v\n", state.active_element_id)
+			} else if !under_mouse &&
+			   !clicked &&
+			   state.hot_element_id == v.id {
+				mal_hot_element("")
 			}
+
+
 		}
 	}
 }
 
 is_element_under_mouse :: proc(r: mc.Rect) -> bool {
-	mouse_position := get_mouse_position()
+	mouse_position := state.input_state.mouse_position
 
 	mouse_collider_size: f32 = 2.0
 	mouse_rect := mc.Rect {
@@ -232,16 +246,38 @@ is_element_under_mouse :: proc(r: mc.Rect) -> bool {
 
 }
 
-mal_hash :: #force_inline proc(
+mal_id :: #force_inline proc(
 	index: int,
 	allocator := context.allocator,
 	location := #caller_location,
-) -> string {
-	return fmt.aprintf(
-		"%s-%s-%v",
-		location.file_path,
-		location.line,
-		index,
-		allocator,
+) -> Mallard_Id {
+	asd := Mallard_Id(
+		fmt.aprintf("%v-%v-%v", location.file_path, location.line, index),
 	)
+
+	return asd
+}
+
+mal_hot_element :: proc(new_id: Mallard_Id, allocator := context.allocator) {
+	if state.hot_element_id != "" {
+		mal_delete_id(state.hot_element_id)
+	}
+	state.hot_element_id =
+	cast(Mallard_Id)strings.clone_from(cast(string)new_id)
+}
+
+mal_active_element :: proc(
+	new_id: Mallard_Id,
+	allocator := context.allocator,
+) {
+	if state.active_element_id != "" {
+		mal_delete_id(state.active_element_id)
+	}
+	state.active_element_id =
+	cast(Mallard_Id)strings.clone_from(cast(string)new_id)
+}
+
+
+mal_delete_id :: proc(id: Mallard_Id) {
+	delete(cast(string)id)
 }

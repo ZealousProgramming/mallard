@@ -6,9 +6,9 @@
   "configurations": [
     {
       "name": "Odin Debug",
-      "type": "cppvsdbg",
+      "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/mallard.exe",
+      "program": "${workspaceFolder}/build/mallard",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
@@ -18,9 +18,9 @@
     },
     {
       "name": "Odin Run",
-      "type": "cppvsdbg",
+      "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build/mallard.exe",
+      "program": "${workspaceFolder}/build/mallard",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",

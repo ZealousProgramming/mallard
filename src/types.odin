@@ -4,12 +4,30 @@ import base "base:runtime"
 import c "core:c"
 import "core:mem"
 
+Mallard_Id :: distinct string
+
 Mallard_State :: struct {
 	viewport_bg_color, component_bg_color:                   mc.Color,
 	screen_width, screen_height:                             c.int,
 	viewport_x, viewport_y, viewport_width, viewport_height: c.int,
 	mouse_position:                                          mc.Vec2,
 	stack_position:                                          mc.Vec2,
+	hot_element_id:                                          Mallard_Id,
+	active_element_id:                                       Mallard_Id,
+	input_state:                                             Mallard_Input_State,
+}
+
+Mallard_Input_State :: struct {
+	mouse_position: mc.Vec2,
+	mouse_left:     Mallard_Mouse_Button_Action_Kind,
+	mouse_right:    Mallard_Mouse_Button_Action_Kind,
+}
+
+Mallard_Mouse_Button_Action_Kind :: enum {
+	NIL,
+	PRESSED,
+	DOWN,
+	RELEASED,
 }
 
 Mallard_Hash :: struct {
@@ -38,7 +56,7 @@ Mallard_Sizing_Behavior :: enum {
 Mallard_Button_State :: enum {
 	NORMAL,
 	HOVER,
-	SELECTED,
+	DOWN,
 }
 
 Mallard_TextField_State :: enum {
@@ -60,16 +78,19 @@ Mallard_Vertical_Alignment :: enum {
 }
 
 Mallard_Element :: struct {
-	hashie:            Mallard_Hash,
-	hash:              string,
-	rect:              mc.Rect,
-	min_size:          mc.Vec2,
-	vertical_sizing:   Mallard_Sizing_Behavior,
-	horizontal_sizing: Mallard_Sizing_Behavior,
+	id:                Mallard_Id, // Used as the unique ID for the element between frames
+	rect:              mc.Rect, // The size of the element
+	hash_previous:     ^Mallard_Element, // The previous generation of the element that shares the same hash
+	hash_next:         ^Mallard_Element, // The next generation of the element that shares the same hash
+	touch_frame:       u64, // The last frame in which the element was touched. Used for pruning
+	min_size:          mc.Vec2, // The requested minimal size the element can be
+	vertical_sizing:   Mallard_Sizing_Behavior, // The behavior to describe the element's vertical sizing
+	horizontal_sizing: Mallard_Sizing_Behavior, // The behavior to describe the element's horizontal sizing
 	// Weak
-	container:         ^Mallard_Element,
-	children:          [dynamic]^Mallard_Element,
+	container:         ^Mallard_Element, // The parent container
+	children:          [dynamic]^Mallard_Element, // Array of the children containers
 	variant:           union {
+		// The type of Element
 		^Mallard_Window,
 		^Mallard_ScrollBox,
 		^Mallard_Scrollbar,

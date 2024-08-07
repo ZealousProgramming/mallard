@@ -83,43 +83,43 @@ build_ui :: proc(delta_time: f32) {
 	)
 	mal_push_container(vl)
 
-	hl := mal_horizontal_layout(
-		mc.Rect{0, 100, f32(state.screen_width), 200},
-		test_horizontal_alignment,
-	)
-	mal_push_container(hl)
+	//hl := mal_horizontal_layout(
+	//	mc.Rect{0, 100, f32(state.screen_width), 200},
+	//	test_horizontal_alignment,
+	//)
+	//mal_push_container(hl)
 
 	if mal_layout_button(
-		   mal_hash(0),
-		   mc.Vec2{32, 32},
-		   .CENTER,
-		   .CENTER,
-		   "First Button",
-	   ) {
+		mal_id(0),
+		mc.Vec2{32, 32},
+		.CENTER,
+		.CENTER,
+		"First Button",
+	) {
 		log.info("First button has been hit")
 	}
 
 	if mal_layout_button(
-		   mal_hash(0),
-		   test_min_size,
-		   .CENTER,
-		   .CENTER,
-		   "Second Button",
-	   ) {
+		mal_id(0),
+		test_min_size,
+		.CENTER,
+		.CENTER,
+		"Second Button",
+	) {
 		log.info("Second button has been hit")
 	}
 
 	if mal_layout_button(
-		   mal_hash(0),
-		   mc.Vec2{32, 32},
-		   .CENTER,
-		   .CENTER,
-		   "Third Button",
-	   ) {
+		mal_id(0),
+		mc.Vec2{32, 32},
+		.CENTER,
+		.CENTER,
+		"Third Button",
+	) {
 		log.info("Third button has been hit")
 	}
 	mal_pop_container()
-	mal_pop_container()
+	//mal_pop_container()
 
 	inc: f32 = 10.0
 	if mal_button(mc.Vec2{50, 200}, mc.Vec2{25, 25}, "-x") {
@@ -143,32 +143,32 @@ build_ui :: proc(delta_time: f32) {
 	mal_push_container(alh)
 
 	if mal_layout_button(
-		   mal_hash(0),
-		   mc.Vec2{25, 25},
-		   .CENTER,
-		   .CENTER,
-		   "LEFT",
-	   ) {
+		mal_id(0),
+		mc.Vec2{25, 25},
+		.CENTER,
+		.CENTER,
+		"LEFT",
+	) {
 		// test_vertical_alignment = .TOP
 		test_horizontal_alignment = .LEFT
 	}
 	if mal_layout_button(
-		   mal_hash(0),
-		   mc.Vec2{25, 25},
-		   .CENTER,
-		   .CENTER,
-		   "CENTER",
-	   ) {
+		mal_id(0),
+		mc.Vec2{25, 25},
+		.CENTER,
+		.CENTER,
+		"CENTER",
+	) {
 		// test_vertical_alignment = .CENTER
 		test_horizontal_alignment = .CENTER
 	}
 	if mal_layout_button(
-		   mal_hash(0),
-		   mc.Vec2{25, 25},
-		   .CENTER,
-		   .CENTER,
-		   "RIGHT",
-	   ) {
+		mal_id(0),
+		mc.Vec2{25, 25},
+		.CENTER,
+		.CENTER,
+		"RIGHT",
+	) {
 		// test_vertical_alignment = .BOTTOM
 		test_horizontal_alignment = .RIGHT
 	}

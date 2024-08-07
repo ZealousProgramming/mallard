@@ -141,6 +141,8 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 					desired_size.x,
 					desired_size.y,
 				}
+
+				element_interaction(c)
 			}
 
 		}
@@ -171,6 +173,8 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 					desired_size.x,
 					desired_size.y,
 				}
+
+				element_interaction(c)
 			}
 		}
 	case .BOTTOM:
@@ -198,6 +202,8 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 					desired_size.x,
 					desired_size.y,
 				}
+
+				element_interaction(c)
 			}
 		}
 
@@ -238,6 +244,8 @@ mal_horizontal_layout_calculate :: proc(self: ^Mallard_Horizontal_Container) {
 					desired_size.x,
 					desired_size.y,
 				}
+
+				element_interaction(c)
 			}
 
 		}
@@ -268,6 +276,8 @@ mal_horizontal_layout_calculate :: proc(self: ^Mallard_Horizontal_Container) {
 					desired_size.x,
 					desired_size.y,
 				}
+
+				element_interaction(c)
 			}
 		}
 	case .RIGHT:
@@ -295,6 +305,8 @@ mal_horizontal_layout_calculate :: proc(self: ^Mallard_Horizontal_Container) {
 					desired_size.x,
 					desired_size.y,
 				}
+
+				element_interaction(c)
 			}
 		}
 

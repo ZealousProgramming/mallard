@@ -2,7 +2,7 @@ package mallard
 
 
 import q "core:container/queue"
-// import "core:log"
+//import "core:log"
 import "core:strings"
 
 import mc "./common"
@@ -22,8 +22,8 @@ Mallard_Button_Style :: struct {
 
 button_free :: proc(self: ^Mallard_Element, allocator := context.allocator) {
 	el, _ := element_variant(self, Mallard_Button)
-	if el.hash != "" {
-		delete(el.hash)
+	if el.id != "" {
+		mal_delete_id(el.id)
 	}
 
 	if el.text != nil {
@@ -42,7 +42,7 @@ button_draw :: proc(self: ^Mallard_Element) {
 		color = el.style.normal_color
 	case .HOVER:
 		color = el.style.hover_color
-	case .SELECTED:
+	case .DOWN:
 		color = el.style.pressed_color
 	}
 	rl.DrawRectangleRounded(
@@ -89,7 +89,7 @@ button_draw :: proc(self: ^Mallard_Element) {
 }
 
 mal_layout_button :: proc(
-	hash: string,
+	id: Mallard_Id,
 	min_size: mc.Vec2,
 	vertical: Mallard_Sizing_Behavior,
 	horizontal: Mallard_Sizing_Behavior,
@@ -99,7 +99,7 @@ mal_layout_button :: proc(
 ) -> bool {
 	b := new(Mallard_Button, allocator)
 
-	b.hash = hash
+	b.id = id
 	b.variant = b
 	b.style = style
 	b.horizontal_sizing = horizontal
@@ -152,20 +152,19 @@ mal_layout_button :: proc(
 
 	append(&frame_commands, rc)
 
-	under_mouse := is_element_under_mouse(b.rect)
-	clicked :=
-		is_mouse_button_pressed(mc.MouseButton.LEFT) ||
-		is_mouse_button_down(mc.MouseButton.LEFT)
+	execute_callback := false
+	if state.active_element_id == b.id {
+		b.state = .DOWN
+		//log.info(state.input_state.mouse_left)
 
-	if under_mouse && clicked {
-		b.state = .SELECTED
-	} else if under_mouse && !clicked {
+	} else if state.hot_element_id == b.id {
 		b.state = .HOVER
-	} else {
-		b.state = .NORMAL
+
+		// NOTE(devon): The release will already have knocked it from active, which is why it'll still be hot
+		execute_callback = state.input_state.mouse_left == .RELEASED
 	}
 
-	return b.state == .SELECTED
+	return execute_callback
 }
 
 mal_button :: proc(
@@ -209,7 +208,5 @@ mal_button :: proc(
 
 	append(&frame_commands, rc)
 
-	element_interaction(b)
-
-	return b.state == .SELECTED
+	return false
 }
