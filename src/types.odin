@@ -185,6 +185,7 @@ Mallard_Vertical_Container :: struct {
 	padding:   f32,
 	fill:      bool,
 	space:     mc.Vec2,
+	sublayout: bool,
 }
 
 Mallard_Horizontal_Container :: struct {
@@ -193,4 +194,5 @@ Mallard_Horizontal_Container :: struct {
 	padding:   f32,
 	fill:      bool,
 	space:     mc.Vec2,
+	sublayout: bool,
 }

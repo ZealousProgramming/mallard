@@ -22,6 +22,7 @@
     - [x] Center
     - [x] End
   - [x] Layout padding
+  - [ ] A child of a vertical layout or horizontal layout shouldn't be able to change position/size, only it's required minimum size and layout config
   - [ ] Expand flag
 - Elements
   - [ ] Icon button

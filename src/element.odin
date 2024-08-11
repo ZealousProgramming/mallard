@@ -3,55 +3,10 @@ package mallard
 import mc "./common"
 import q "core:container/queue"
 import "core:fmt"
-//import "core:log"
+import "core:log"
 import "core:strings"
 
-
-// element_update :: proc(el: ^Mallard_Element, allocator := context.allocator) {
-// 	if el == nil {return}
-// 	if el.children != nil && len(el.children) > 0 {
-// 		for c in el.children {
-// 			element_update(c, allocator)
-// 		}
-// 	}
-
-// 	if el.update != nil {
-// 		el->update()
-// 	}
-// }
-
-// element_draw :: proc(el: ^Mallard_Element, allocator := context.allocator) {
-// 	if el == nil {return}
-
-// 	if el.draw != nil {
-// 		el->draw()
-// 	}
-
-// 	if el.children != nil && len(el.children) > 0 {
-// 		for c in el.children {
-// 			element_draw(c, allocator)
-// 		}
-// 	}
-
-
-// }
-
-// element_deinit :: proc(el: ^Mallard_Element, allocator := context.allocator) {
-// 	if el == nil {return}
-
-// 	if el.children != nil && len(el.children) > 0 {
-// 		for c in el.children {
-// 			element_deinit(c, allocator)
-// 		}
-
-// 		delete(el.children)
-// 	}
-
-// 	if el.deinit != nil {
-// 		free(el.vtable, allocator)
-// 		el->deinit(allocator)
-// 	}
-// }
+_ :: log.log
 
 element_variant :: proc(
 	el: ^Mallard_Element,
@@ -87,59 +42,70 @@ element_basic_deinit :: proc(
 
 mal_push_container :: proc(container: ^Mallard_Element) {
 	q.append(&container_stack, container)
-	state.stack_position += mc.Vec2{container.rect.x, container.rect.y}
+	//state.stack_position += mc.Vec2{container.rect.x, container.rect.y}
 }
 
 mal_pop_container :: proc() {
-	c := q.pop_back(&container_stack)
-	state.stack_position -= mc.Vec2{c.rect.x, c.rect.y}
+	//c := 
+	q.pop_back(&container_stack)
+	//state.stack_position -= mc.Vec2{c.rect.x, c.rect.y}
+}
+
+mal_propagate_size_change :: proc(self: ^Mallard_Element) {
+	if self == nil {return}
+	if self.container == nil {return}
+
+	//log.infof("Child: %v, Parent: %v\n", self.id, self.container.id)
+	if self.container.rect.width < self.rect.width {
+		self.container.rect.width = self.rect.width
+	}
+	if self.container.rect.height < self.rect.height {
+		self.container.rect.height = self.rect.height
+	}
+
+	#partial switch v in self.container.variant {
+	case ^Mallard_Horizontal_Container:
+		{
+			v.space = mc.Vec2 {
+				self.container.rect.width,
+				self.container.rect.height,
+			}
+		}
+	case ^Mallard_Vertical_Container:
+		{
+			v.space = mc.Vec2 {
+				self.container.rect.width,
+				self.container.rect.height,
+			}
+		}
+	}
+
+	mal_propagate_size_change(self.container)
 }
 
 mal_container_size_check :: proc(container: ^Mallard_Element, size: mc.Vec2) {
 	if container == nil {return}
-	// if q.len(container_stack) <= 0 {return}
-	// container := q.peek_back(&container_stack)^
 
+	change_x := false
 	if container.rect.width < size.x {
-		container.rect.width = size.x
+		change_x = true
 	}
 
+	change_y := false
 	if container.rect.height < size.y {
-		container.rect.height = size.y
+		change_y = true
 	}
 
+	mal_adjust_size(
+		container,
+		mc.Vec2 {
+			change_x ? size.x : container.rect.width,
+			change_y ? size.y : container.rect.height,
+		},
+	)
 
-	#partial switch v in container.variant {
-	case ^Mallard_Container:
-		{
-			v.space = mc.Vec2{container.rect.width, container.rect.height}
-		}
-	case ^Mallard_Vertical_Container:
-		{
-			v.space = mc.Vec2{container.rect.width, container.rect.height}
-		}
-	}
+	mal_propagate_size_change(container)
 }
-
-
-// element_rect :: proc(el: ^Mallard_Element) -> mc.Rect {
-// 	if el == nil {return mc.Rect{}}
-// 	gp := el.transform.global
-// 	sz := el.transform.size
-// 	return mc.Rect{gp.x, gp.y, sz.x, sz.y}
-// }
-
-// element_position :: proc(el: ^Mallard_Element) {
-// 	if el == nil {return}
-// 	for c in el.children {
-// 		c.transform.global.x = c.transform.local.x + el.transform.global.x
-// 		c.transform.global.y = c.transform.local.y + el.transform.global.y
-
-// 		if len(c.children) == 0 {continue}
-
-// 		element_position(c)
-// 	}
-// }
 
 
 element_recalculate_global_position :: proc(
@@ -168,17 +134,50 @@ element_calculate_used_space_vertical :: proc(self: ^Mallard_Element) -> f32 {
 	   self.children == nil ||
 	   len(self.children) == 0 {return 0.0}
 
-	spaced_used: f32 = 0.0
+	space_used: f32 = 0.0
 	#partial switch v in self.variant {
 	case ^Mallard_Vertical_Container:
 		{
 			for c in v.children {
-				spaced_used += c.rect.height + v.padding
+				#partial switch cv in c.variant {
+				case ^Mallard_Vertical_Container:
+					{
+						space_used += element_calculate_used_space_vertical(cv)
+					}
+				case ^Mallard_Horizontal_Container:
+					{
+						space_used += element_calculate_used_space_vertical(cv)
+					}
+				case:
+					{
+						space_used += c.rect.height + v.padding
+					}
+				}
+			}
+		}
+	case ^Mallard_Horizontal_Container:
+		{
+
+			for c in v.children {
+				#partial switch cv in c.variant {
+				case ^Mallard_Vertical_Container:
+					{
+						space_used += element_calculate_used_space_vertical(cv)
+					}
+				case ^Mallard_Horizontal_Container:
+					{
+						space_used += element_calculate_used_space_vertical(cv)
+					}
+				case:
+					{
+						space_used += c.rect.height + v.padding
+					}
+				}
 			}
 		}
 	}
 
-	return spaced_used
+	return space_used
 }
 
 element_calculate_used_space_horizontal :: proc(
@@ -280,4 +279,5 @@ mal_active_element :: proc(
 
 mal_delete_id :: proc(id: Mallard_Id) {
 	delete(cast(string)id)
+
 }
