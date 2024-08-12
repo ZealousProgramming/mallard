@@ -204,7 +204,10 @@ element_interaction :: proc(self: ^Mallard_Element) {
 	#partial switch v in self.variant {
 	case ^Mallard_Button:
 		{
-			under_mouse := is_element_under_mouse(v.rect)
+			gp := element_recalculate_global_position(self)
+			under_mouse := is_element_under_mouse(
+				mc.Rect{gp.x, gp.y, self.rect.width, self.rect.height},
+			)
 			clicked :=
 				state.input_state.mouse_left == .PRESSED ||
 				state.input_state.mouse_left == .DOWN

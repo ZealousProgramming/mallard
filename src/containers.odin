@@ -130,11 +130,9 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 	}
 
 	// Cycle through children and divy up the self.space
-	global_offset: mc.Vec2 = element_recalculate_global_position(self)
 
 	offset := mc.Vec2{0.0, 0.0}
 	space_used := element_calculate_used_space_vertical(self)
-	//log.info(space_used)
 	mal_container_size_check(self, mc.Vec2{self.rect.width, space_used})
 
 	switch self.alignment {
@@ -168,16 +166,11 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 				)
 
 				desired_position.y += offset.y
-				//offset.y += c.min_size.y + self.padding
 				offset.y += desired_size.y + self.padding
-				log.infof("Desired size: %v\n", desired_size.y + self.padding)
-				log.infof("Desired Y: %v\n", desired_position.y)
-				log.infof("Offset: %v\n", offset.y)
-				log.infof("Used Space: %v\n", space_used)
 
 				c.rect = mc.Rect {
-					desired_position.x, //+ global_offset.x,
-					desired_position.y, //+ global_offset.y,
+					desired_position.x,
+					desired_position.y,
 					desired_size.x,
 					desired_size.y,
 				}
@@ -218,8 +211,10 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 							)
 						}
 
-						desired_position.y =
-							self.rect.height / 2.0 - v.rect.height / 2.0
+						desired_size.y = element_calculate_used_space_vertical(
+							v,
+						)
+
 					}
 
 
@@ -232,9 +227,9 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 							)
 						}
 
-						desired_position.y =
-							self.rect.height / 2.0 - v.rect.height / 2.0
-						//self.rect.height / 2.0 - v.rect.height / 2.0
+						desired_size.y = element_calculate_used_space_vertical(
+							v,
+						)
 					}
 
 				}
@@ -251,8 +246,8 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 				offset.y += desired_size.y + self.padding
 
 				c.rect = mc.Rect {
-					desired_position.x, // + global_offset.x,
-					desired_position.y, // + global_offset.y,
+					desired_position.x,
+					desired_position.y,
 					desired_size.x,
 					desired_size.y,
 				}
@@ -260,21 +255,11 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 				#partial switch v in c.variant {
 				case ^Mallard_Vertical_Container:
 					{
-						//v.rect.x += global_offset.x
-						//v.rect.y += global_offset.y
 						mal_vertical_layout_calculate(v)
 						continue
 					}
 				case ^Mallard_Horizontal_Container:
 					{
-						log.infof("Desired Y: %v\n", desired_position.y)
-						log.infof(
-							"Offset Before: %v\n",
-							offset.y - desired_size.y - self.padding,
-						)
-						log.infof("Offset After: %v\n", offset.y)
-						//v.rect.x += global_offset.x
-						//v.rect.y += global_offset.y
 						mal_horizontal_layout_calculate(v)
 						continue
 					}
@@ -289,6 +274,40 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 			#reverse for c, _ in self.children {
 
 				desired_size := mc.Vec2{c.rect.width, c.rect.height}
+				#partial switch v in c.variant {
+				case ^Mallard_Vertical_Container:
+					{
+						for lc in v.children {
+							mal_container_size_check(
+								v,
+								mc.Vec2{0.0, lc.rect.height},
+							)
+						}
+
+						desired_size.y = element_calculate_used_space_vertical(
+							v,
+						)
+
+					}
+
+
+				case ^Mallard_Horizontal_Container:
+					{
+						for lc in v.children {
+							mal_container_size_check(
+								v,
+								mc.Vec2{0.0, lc.rect.height},
+							)
+						}
+
+						desired_size.y = element_calculate_used_space_vertical(
+							v,
+						)
+					}
+
+				}
+				// NOTE(devon): We're change the desired_size of sublayouts above, so this needs to be after unlike 
+				// on the other alignments
 				desired_position := mc.Vec2 {
 					0.0,
 					self.rect.height - desired_size.y,
@@ -305,8 +324,8 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 				offset.y -= desired_size.y + self.padding
 
 				c.rect = mc.Rect {
-					desired_position.x + global_offset.x,
-					desired_position.y + global_offset.y,
+					desired_position.x,
+					desired_position.y,
 					desired_size.x,
 					desired_size.y,
 				}

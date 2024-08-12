@@ -248,14 +248,17 @@ build_ui :: proc(delta_time: f32) {
 	alh.vertical_sizing = .BEGIN
 	alh.horizontal_sizing = .BEGIN
 	mal_push_container(alh)
+	row := 1
 
 	if mal_layout_button(mal_id(), mc.Vec2{25, 25}, .CENTER, .CENTER, "LEFT") {
 		// test_vertical_alignment = .TOP
 		test_horizontal_alignment = .LEFT
+		log.infof("R: %v, C: %v\n", row, 1)
 	}
 	if mal_layout_button(mal_id(), test_min_size, .CENTER, .CENTER, "CENTER") {
 		// test_vertical_alignment = .CENTER
 		test_horizontal_alignment = .CENTER
+		log.infof("R: %v, C: %v\n", row, 2)
 	}
 	if mal_layout_button(
 		mal_id(),
@@ -266,6 +269,7 @@ build_ui :: proc(delta_time: f32) {
 	) {
 		// test_vertical_alignment = .BOTTOM
 		test_horizontal_alignment = .RIGHT
+		log.infof("R: %v, C: %v\n", row, 3)
 	}
 	mal_pop_container()
 
@@ -273,14 +277,17 @@ build_ui :: proc(delta_time: f32) {
 	alh2.vertical_sizing = .BEGIN
 	alh2.horizontal_sizing = .BEGIN
 	mal_push_container(alh2)
+	row = 2
 
 	if mal_layout_button(mal_id(), mc.Vec2{25, 25}, .CENTER, .CENTER, "LEFT") {
 		// test_vertical_alignment = .TOP
 		test_horizontal_alignment = .LEFT
+		log.infof("R: %v, C: %v\n", row, 1)
 	}
 	if mal_layout_button(mal_id(), test_min_size, .CENTER, .CENTER, "CENTER") {
 		// test_vertical_alignment = .CENTER
 		test_horizontal_alignment = .CENTER
+		log.infof("R: %v, C: %v\n", row, 2)
 	}
 	if mal_layout_button(
 		mal_id(),
@@ -291,9 +298,38 @@ build_ui :: proc(delta_time: f32) {
 	) {
 		// test_vertical_alignment = .BOTTOM
 		test_horizontal_alignment = .RIGHT
+		log.infof("R: %v, C: %v\n", row, 3)
 	}
 	mal_pop_container()
 
+	alh3 := mal_horizontal_layout(mc.Rect{}, .LEFT)
+	alh3.vertical_sizing = .BEGIN
+	alh3.horizontal_sizing = .BEGIN
+	mal_push_container(alh3)
+	row = 3
+
+	if mal_layout_button(mal_id(), mc.Vec2{25, 25}, .CENTER, .CENTER, "LEFT") {
+		// test_vertical_alignment = .TOP
+		test_horizontal_alignment = .LEFT
+		log.infof("R: %v, C: %v\n", row, 1)
+	}
+	if mal_layout_button(mal_id(), test_min_size, .CENTER, .CENTER, "CENTER") {
+		// test_vertical_alignment = .CENTER
+		test_horizontal_alignment = .CENTER
+		log.infof("R: %v, C: %v\n", row, 2)
+	}
+	if mal_layout_button(
+		mal_id(),
+		mc.Vec2{100, 25},
+		.CENTER,
+		.CENTER,
+		"RIGHT",
+	) {
+		// test_vertical_alignment = .BOTTOM
+		test_horizontal_alignment = .RIGHT
+		log.infof("R: %v, C: %v\n", row, 3)
+	}
+	mal_pop_container()
 
 	//log.info(alh.space)
 	//alh2 := mal_horizontal_layout(mc.Rect{0.0, 0.0, 0.0, 0.0}, .LEFT)
