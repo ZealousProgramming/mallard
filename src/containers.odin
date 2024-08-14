@@ -22,8 +22,6 @@ mal_layout :: proc(
 
 	b.variant = b
 	b.rect = rect
-	b.rect.x += state.stack_position.x
-	b.rect.y += state.stack_position.y
 
 	if q.len(container_stack) > 0 {
 		container := q.peek_back(&container_stack)^
@@ -52,8 +50,6 @@ mal_vertical_layout :: proc(
 	b.variant = b
 	b.alignment = alignment
 	b.rect = rect
-	//b.rect.x += state.stack_position.x
-	//b.rect.y += state.stack_position.y
 	b.space.x = rect.width
 	b.space.y = rect.height
 
@@ -90,6 +86,14 @@ mal_horizontal_layout :: proc(
 ) -> ^Mallard_Horizontal_Container {
 	b := new(Mallard_Horizontal_Container, allocator)
 
+	b.variant = b
+	b.alignment = alignment
+	b.rect = rect
+	b.space.x = rect.width
+	b.space.y = rect.height
+
+	b.padding = 5.0
+
 	if q.len(container_stack) > 0 {
 		container := q.peek_back(&container_stack)^
 		append(&container.children, b)
@@ -102,11 +106,6 @@ mal_horizontal_layout :: proc(
 			}
 		}
 	}
-
-	b.variant = b
-	b.alignment = alignment
-	b.padding = 5.0
-	mal_adjust_size(b, mc.Vec2{rect.width, rect.height})
 
 	// Render Command
 	rc := new(Mallard_Render_Command, allocator)
@@ -129,8 +128,6 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 		mal_container_size_check(self, mc.Vec2{c.rect.width, c.rect.height})
 	}
 
-	// Cycle through children and divy up the self.space
-
 	offset := mc.Vec2{0.0, 0.0}
 	space_used := element_calculate_used_space_vertical(self)
 	mal_container_size_check(self, mc.Vec2{self.rect.width, space_used})
@@ -139,23 +136,18 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 	case .TOP:
 		{
 			for c, _ in self.children {
-
 				desired_size := mc.Vec2{c.rect.width, c.rect.height}
 				desired_position := mc.Vec2{0.0, 0.0}
 
 				#partial switch v in c.variant {
-				case ^Mallard_Vertical_Container:
+				case ^Mallard_Vertical_Container,
+				     ^Mallard_Horizontal_Container:
 					{
 						desired_size.y = element_calculate_used_space_vertical(
-							v,
+							c,
 						)
 					}
-				case ^Mallard_Horizontal_Container:
-					{
-						desired_size.y = element_calculate_used_space_vertical(
-							v,
-						)
-					}
+
 				}
 
 				determine_horizontal_sizing(
@@ -202,36 +194,20 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 				}
 
 				#partial switch v in c.variant {
-				case ^Mallard_Vertical_Container:
+				case ^Mallard_Vertical_Container,
+				     ^Mallard_Horizontal_Container:
 					{
-						for lc in v.children {
+						for lc in c.children {
 							mal_container_size_check(
-								v,
+								c,
 								mc.Vec2{0.0, lc.rect.height},
 							)
 						}
 
 						desired_size.y = element_calculate_used_space_vertical(
-							v,
-						)
-
-					}
-
-
-				case ^Mallard_Horizontal_Container:
-					{
-						for lc in v.children {
-							mal_container_size_check(
-								v,
-								mc.Vec2{0.0, lc.rect.height},
-							)
-						}
-
-						desired_size.y = element_calculate_used_space_vertical(
-							v,
+							c,
 						)
 					}
-
 				}
 
 				determine_horizontal_sizing(
@@ -240,7 +216,6 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 					&desired_position,
 					&desired_size,
 				)
-				mc._drawCircleV(desired_position, 5, mc.YELLOW)
 
 				desired_position.y += offset.y
 				offset.y += desired_size.y + self.padding
@@ -272,40 +247,25 @@ mal_vertical_layout_calculate :: proc(self: ^Mallard_Vertical_Container) {
 	case .BOTTOM:
 		{
 			#reverse for c, _ in self.children {
-
 				desired_size := mc.Vec2{c.rect.width, c.rect.height}
 				#partial switch v in c.variant {
-				case ^Mallard_Vertical_Container:
+				case ^Mallard_Vertical_Container,
+				     ^Mallard_Horizontal_Container:
 					{
-						for lc in v.children {
+						for lc in c.children {
 							mal_container_size_check(
-								v,
+								c,
 								mc.Vec2{0.0, lc.rect.height},
 							)
 						}
 
 						desired_size.y = element_calculate_used_space_vertical(
-							v,
+							c,
 						)
 
 					}
-
-
-				case ^Mallard_Horizontal_Container:
-					{
-						for lc in v.children {
-							mal_container_size_check(
-								v,
-								mc.Vec2{0.0, lc.rect.height},
-							)
-						}
-
-						desired_size.y = element_calculate_used_space_vertical(
-							v,
-						)
-					}
-
 				}
+
 				// NOTE(devon): We're change the desired_size of sublayouts above, so this needs to be after unlike 
 				// on the other alignments
 				desired_position := mc.Vec2 {
@@ -353,9 +313,6 @@ mal_horizontal_layout_calculate :: proc(self: ^Mallard_Horizontal_Container) {
 	if self == nil {return}
 	if self.children == nil || len(self.children) == 0 {return}
 
-	// Cycle through children and divy up the self.space
-	global_offset: mc.Vec2 = element_recalculate_global_position(self)
-
 	// Find out the container's size
 	for c in self.children {
 		mal_container_size_check(self, mc.Vec2{c.rect.width, c.rect.height})
@@ -374,6 +331,16 @@ mal_horizontal_layout_calculate :: proc(self: ^Mallard_Horizontal_Container) {
 				desired_size := mc.Vec2{c.rect.width, c.rect.height}
 				desired_position := mc.Vec2{0.0, 0.0}
 
+				#partial switch v in c.variant {
+				case ^Mallard_Vertical_Container,
+				     ^Mallard_Horizontal_Container:
+					{
+						desired_size.x =
+							element_calculate_used_space_horizontal(c)
+					}
+
+				}
+
 				determine_vertical_sizing(
 					c,
 					self,
@@ -385,8 +352,8 @@ mal_horizontal_layout_calculate :: proc(self: ^Mallard_Horizontal_Container) {
 				offset.x += desired_size.x + self.padding
 
 				c.rect = mc.Rect {
-					desired_position.x, // + global_offset.x,
-					desired_position.y, // + global_offset.y,
+					desired_position.x,
+					desired_position.y,
 					desired_size.x,
 					desired_size.y,
 				}
@@ -418,6 +385,23 @@ mal_horizontal_layout_calculate :: proc(self: ^Mallard_Horizontal_Container) {
 					0.0,
 				}
 
+				#partial switch v in c.variant {
+				case ^Mallard_Vertical_Container,
+				     ^Mallard_Horizontal_Container:
+					{
+						for lc in c.children {
+							mal_container_size_check(
+								c,
+								mc.Vec2{lc.rect.width, 0.0},
+							)
+						}
+
+						desired_size.x =
+							element_calculate_used_space_horizontal(c)
+					}
+				}
+
+
 				determine_vertical_sizing(
 					c,
 					self,
@@ -429,11 +413,11 @@ mal_horizontal_layout_calculate :: proc(self: ^Mallard_Horizontal_Container) {
 				offset.x += desired_size.x + self.padding
 
 				c.rect = mc.Rect {
-					desired_position.x, //+ global_offset.x,
-					desired_position.y, //+ global_offset.y,
-					desired_size.x,
-					desired_size.y,
-				}
+						desired_position.x, //+ global_offset.x,
+						desired_position.y, //+ global_offset.y,
+						desired_size.x,
+						desired_size.y,
+					}
 
 				#partial switch v in c.variant {
 				case ^Mallard_Vertical_Container:
@@ -455,6 +439,23 @@ mal_horizontal_layout_calculate :: proc(self: ^Mallard_Horizontal_Container) {
 			#reverse for c, _ in self.children {
 
 				desired_size := mc.Vec2{c.rect.width, c.rect.height}
+				#partial switch v in c.variant {
+				case ^Mallard_Vertical_Container,
+				     ^Mallard_Horizontal_Container:
+					{
+						for lc in c.children {
+							mal_container_size_check(
+								c,
+								mc.Vec2{lc.rect.width, 0.0},
+							)
+						}
+
+						desired_size.x =
+							element_calculate_used_space_horizontal(c)
+
+					}
+				}
+
 				desired_position := mc.Vec2 {
 					self.rect.width - desired_size.x,
 					0.0,
@@ -471,8 +472,8 @@ mal_horizontal_layout_calculate :: proc(self: ^Mallard_Horizontal_Container) {
 				offset.x -= desired_size.x + self.padding
 
 				c.rect = mc.Rect {
-					desired_position.x + global_offset.x,
-					desired_position.y + global_offset.y,
+					desired_position.x,
+					desired_position.y,
 					desired_size.x,
 					desired_size.y,
 				}

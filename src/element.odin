@@ -42,13 +42,11 @@ element_basic_deinit :: proc(
 
 mal_push_container :: proc(container: ^Mallard_Element) {
 	q.append(&container_stack, container)
-	//state.stack_position += mc.Vec2{container.rect.x, container.rect.y}
 }
 
 mal_pop_container :: proc() {
 	//c := 
 	q.pop_back(&container_stack)
-	//state.stack_position -= mc.Vec2{c.rect.x, c.rect.y}
 }
 
 mal_propagate_size_change :: proc(self: ^Mallard_Element) {
@@ -187,17 +185,58 @@ element_calculate_used_space_horizontal :: proc(
 	   self.children == nil ||
 	   len(self.children) == 0 {return 0.0}
 
-	spaced_used: f32 = 0.0
+	space_used: f32 = 0.0
 	#partial switch v in self.variant {
-	case ^Mallard_Horizontal_Container:
+	case ^Mallard_Vertical_Container:
 		{
 			for c in v.children {
-				spaced_used += c.rect.width + v.padding
+				#partial switch cv in c.variant {
+				case ^Mallard_Vertical_Container:
+					{
+						space_used += element_calculate_used_space_horizontal(
+							cv,
+						)
+					}
+				case ^Mallard_Horizontal_Container:
+					{
+						space_used += element_calculate_used_space_horizontal(
+							cv,
+						)
+					}
+				case:
+					{
+						space_used += c.rect.width + v.padding
+					}
+				}
+			}
+		}
+	case ^Mallard_Horizontal_Container:
+		{
+
+			for c in v.children {
+				#partial switch cv in c.variant {
+				case ^Mallard_Vertical_Container:
+					{
+						space_used += element_calculate_used_space_horizontal(
+							cv,
+						)
+					}
+				case ^Mallard_Horizontal_Container:
+					{
+						space_used += element_calculate_used_space_horizontal(
+							cv,
+						)
+					}
+				case:
+					{
+						space_used += c.rect.width + v.padding
+					}
+				}
 			}
 		}
 	}
 
-	return spaced_used
+	return space_used
 }
 
 element_interaction :: proc(self: ^Mallard_Element) {

@@ -2,7 +2,6 @@ package mallard
 
 import q "core:container/queue"
 import "core:log"
-// import "core:mem"
 
 import mc "./common"
 
@@ -20,7 +19,6 @@ state := Mallard_State {
 	viewport_y         = 32,
 	component_bg_color = {48, 48, 48, 255},
 	viewport_bg_color  = {24, 24, 24, 255},
-	stack_position     = mc.Vec2{0.0, 0.0},
 	input_state        = {},
 }
 
@@ -43,10 +41,7 @@ mal_init :: proc() {
 mal_begin_frame :: proc() {
 	mal_clear_commands()
 	q.clear(&container_stack)
-	state.stack_position.x = 0.0
-	state.stack_position.y = 0.0
 
-	//log.infof("Active Element: %v\n", state.active_element_id)
 	root_container = mal_layout(
 		mc.Rect{0, 0, f32(state.screen_width), f32(state.screen_height)},
 	)
