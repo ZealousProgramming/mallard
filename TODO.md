@@ -1,14 +1,6 @@
 # MALLARD TODOs
 
 - General
-  - [x] Define what will be user code and what will be library code
-  - [x] Introduce a 2nd pass
-    - [x] First Pass is for Building
-      - [x] Remove positioning functionality from build pass
-      - [x] Add to top container's children
-    - [x] Second Pass is for figuring out Layout
-      - [x] Position functionality from build pass
-  - [ ] Cache previous frame's data
 - Layout
   - [x] Element Minimum Size
   - [x] Layout contain takes the largest minimum_size between itself and it's children elements
@@ -18,6 +10,7 @@
     - [x] Center
     - [x] End
   - [x] Layout padding
+  - [x] A child of a vertical layout or horizontal layout shouldn't be able to change position/size, only it's required minimum size and layout config
   - [ ] Expand flag
 - Elements
   - [ ] Icon button

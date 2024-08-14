@@ -4,7 +4,7 @@
     {
       "label": "build",
       "type": "shell",
-      "command": "./build.bat",
+      "command": "./build.sh",
       "group": {
         "kind": "build",
         "isDefault": true
@@ -14,7 +14,7 @@
     {
       "label": "build prod",
       "type": "shell",
-      "command": "odin build ./src -out:mallard.exe ",
+      "command": "odin build ./src -out:mallard ",
       "group": {
         "kind": "build",
         "isDefault": true
