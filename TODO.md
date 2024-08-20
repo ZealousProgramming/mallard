@@ -15,8 +15,7 @@
 - Elements
   - [ ] Icon button
   - [ ] Checkbox Button
-  - [ ] Toggle Button
-  - [ ] Radio Button
+  - [ ] Radio Button / Radio Button  Group
   - [ ] Slider
   - [ ] TextInput
   - [ ] Dropdown button

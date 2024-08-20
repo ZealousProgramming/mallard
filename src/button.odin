@@ -8,17 +8,10 @@ import "core:strings"
 import mc "./common"
 import rl "vendor:raylib"
 
-Mallard_Button_Style :: struct {
-	normal_color:   rl.Color,
-	hover_color:    rl.Color,
-	pressed_color:  mc.Color,
-	text_color:     mc.Color,
-	padding:        mc.Vec2,
-	segments:       int,
-	roundness:      f32,
-	line_thickness: f32,
-	is_rounded:     bool,
-}
+// --- Button Types ----
+// mal_button: Standard Button with text
+// mal_icon_button: Standard Button with an icon rather than text
+// mal_checkbox: A button with a fillable box (checkmark/block)
 
 button_free :: proc(self: ^Mallard_Element, allocator := context.allocator) {
 	el, _ := element_variant(self, Mallard_Button)
@@ -92,7 +85,7 @@ button_draw :: proc(self: ^Mallard_Element) {
 	)
 }
 
-mal_layout_button :: proc(
+mal_button :: proc(
 	id: Mallard_Id,
 	min_size: mc.Vec2,
 	vertical: Mallard_Sizing_Behavior,
@@ -116,23 +109,13 @@ mal_layout_button :: proc(
 		f32(EDITOR_FONT_SIZE),
 		EDITOR_FONT_SPACING,
 	)
+
 	desired_size := mc.Vec2 {
 		text_size.x + style.padding.x * 2,
 		text_size.y + style.padding.y * 2,
 	}
 	desired_position := mc.Vec2{0.0, 0.0}
-
-	if b.min_size.x > desired_size.x {
-		desired_size.x = b.min_size.x
-	} else {
-		b.min_size.x = desired_size.x
-	}
-
-	if b.min_size.y > desired_size.y {
-		desired_size.y = b.min_size.y
-	} else {
-		b.min_size.y = desired_size.y
-	}
+	button_determine_desired_size(b, &desired_size)
 
 	b.rect = mc.Rect {
 		desired_position.x,
@@ -145,19 +128,6 @@ mal_layout_button :: proc(
 		container := q.peek_back(&container_stack)^
 		append(&container.children, b)
 		b.container = container
-
-		//mal_adjust_size(
-		//	container,
-		//	mc.Vec2 {
-		//		container.rect.width,
-		//		container.rect.height + b.rect.height,
-		//	},
-		//)
-
-		//mal_container_size_check(
-		//	container,
-		//	mc.Vec2{b.rect.width, b.rect.height},
-		//)
 	}
 
 	rc := new(Mallard_Render_Command, allocator)
@@ -167,6 +137,28 @@ mal_layout_button :: proc(
 
 	append(&frame_commands, rc)
 
+	return button_state_update(b)
+}
+
+button_determine_desired_size :: proc(
+	b: ^Mallard_Button,
+	desired_size: ^mc.Vec2,
+) {
+	if b.min_size.x > desired_size.x {
+		desired_size.x = b.min_size.x
+	} else {
+		b.min_size.x = desired_size.x
+	}
+
+	if b.min_size.y > desired_size.y {
+		desired_size.y = b.min_size.y
+	} else {
+		b.min_size.y = desired_size.y
+	}
+
+}
+
+button_state_update :: proc(b: ^Mallard_Button) -> bool {
 	execute_callback := false
 	if state.active_element_id == b.id {
 		b.state = .DOWN

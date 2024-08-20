@@ -163,7 +163,7 @@ build_ui :: proc(delta_time: f32) {
 		mal_push_container(alh)
 		{
 
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				mc.Vec2{25, 25},
 				.CENTER,
@@ -174,7 +174,7 @@ build_ui :: proc(delta_time: f32) {
 				test_horizontal_alignment = .LEFT
 				log.infof("R: %v, C: %v\n", row, 1)
 			}
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				test_min_size,
 				.CENTER,
@@ -185,7 +185,7 @@ build_ui :: proc(delta_time: f32) {
 				test_horizontal_alignment = .CENTER
 				log.infof("R: %v, C: %v\n", row, 2)
 			}
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				mc.Vec2{100, 25},
 				.CENTER,
@@ -206,7 +206,7 @@ build_ui :: proc(delta_time: f32) {
 		{
 			row = 2
 
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				mc.Vec2{25, 25},
 				.CENTER,
@@ -217,7 +217,7 @@ build_ui :: proc(delta_time: f32) {
 				test_horizontal_alignment = .LEFT
 				log.infof("R: %v, C: %v\n", row, 1)
 			}
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				test_min_size,
 				.CENTER,
@@ -228,7 +228,7 @@ build_ui :: proc(delta_time: f32) {
 				test_horizontal_alignment = .CENTER
 				log.infof("R: %v, C: %v\n", row, 2)
 			}
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				mc.Vec2{100, 25},
 				.CENTER,
@@ -249,7 +249,7 @@ build_ui :: proc(delta_time: f32) {
 		{
 			row = 3
 
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				mc.Vec2{25, 25},
 				.CENTER,
@@ -260,7 +260,7 @@ build_ui :: proc(delta_time: f32) {
 				test_horizontal_alignment = .LEFT
 				log.infof("R: %v, C: %v\n", row, 1)
 			}
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				test_min_size,
 				.CENTER,
@@ -271,7 +271,7 @@ build_ui :: proc(delta_time: f32) {
 				test_horizontal_alignment = .CENTER
 				log.infof("R: %v, C: %v\n", row, 2)
 			}
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				mc.Vec2{100, 25},
 				.CENTER,
@@ -305,7 +305,7 @@ layout_ui :: proc(delta_time: f32) {
 		{
 
 
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				mc.Vec2{32, 32},
 				.CENTER,
@@ -316,7 +316,7 @@ layout_ui :: proc(delta_time: f32) {
 			}
 
 
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				mc.Vec2{32, 32},
 				.CENTER,
@@ -327,7 +327,7 @@ layout_ui :: proc(delta_time: f32) {
 			}
 
 
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				test_min_size,
 				.CENTER,
@@ -337,7 +337,7 @@ layout_ui :: proc(delta_time: f32) {
 				log.info("Third button has been hit")
 			}
 
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				mc.Vec2{32, 32},
 				.CENTER,
@@ -357,7 +357,7 @@ layout_ui :: proc(delta_time: f32) {
 		{
 
 
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				mc.Vec2{32, 32},
 				.CENTER,
@@ -367,7 +367,7 @@ layout_ui :: proc(delta_time: f32) {
 				log.info("First button has been hit")
 			}
 
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				test_min_size,
 				.CENTER,
@@ -377,7 +377,7 @@ layout_ui :: proc(delta_time: f32) {
 				log.info("Second button has been hit")
 			}
 
-			if mal_layout_button(
+			if mal_button(
 				mal_id(),
 				mc.Vec2{32, 32},
 				.CENTER,
